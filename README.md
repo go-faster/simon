@@ -2,6 +2,8 @@
 
 Observability load testing and simulation, under construction.
 
+Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
+
 ## Observability
 - [ ] Logs
 - [ ] Metrics
@@ -32,3 +34,17 @@ Observability load testing and simulation, under construction.
 | `OTEL_SERVICE_NAME`               | OTEL Service name                                                           | `app`                   | `unknown_service`                                            |
 | `OTEL_RESOURCE_ATTRIBUTES`        | OTEL Resource attributes                                                    | `service.namespace=pfm` |                                                              |
 | `OTEL_PROPAGATORS`                | OTEL Propagators (only tracecontext and baggage supported, none to disable) | `none`                  | `tracecontext,baggage`                                       |
+
+## Run
+
+``console
+$ docker run -i -t ghcr.io/go-faster/simon:latest
+{"level":"info","ts":1680181590.1318264,"logger":"metrics","caller":"app/metrics.go:286","msg":"No metrics exporter is configured by OTEL_METRICS_EXPORTER"}
+{"level":"info","ts":1680181590.134922,"logger":"metrics","caller":"app/metrics.go:319","msg":"No traces exporter is configured by OTEL_TRACES_EXPORTER"}
+{"level":"info","ts":1680181590.1362665,"logger":"metrics","caller":"app/metrics.go:356","msg":"Propagators configured","propagators":["tracecontext","baggage"]}
+{"level":"info","ts":1680181590.1375117,"logger":"metrics","caller":"app/metrics.go:112","msg":"Registering pprof routes","routes":["profile","symbol","trace","goroutine","heap","threadcreate","block"]}
+{"level":"info","ts":1680181590.139126,"logger":"metrics","caller":"app/metrics.go:379","msg":"Metrics initialized","otel.resource":"process.runtime.description=go version go1.20.2 linux/riscv64,process.runtime.name=go,process.runtime.version=go1.20.2,service.name=simon,service.namespace=go-faster,telemetry.sdk.language=go,telemetry.sdk.name=opentelemetry,telemetry.sdk.version=1.14.0","metrics.http.addr":"localhost:9464"}
+{"level":"info","ts":1680181590.1406643,"logger":"metrics","caller":"app/metrics.go:62","msg":"Starting metrics server"}
+{"level":"info","ts":1680181591.1405013,"caller":"simon/main.go:28","msg":"Hello, world!"}
+{"level":"info","ts":1680181592.1402662,"caller":"simon/main.go:28","msg":"Hello, world!"}
+``
