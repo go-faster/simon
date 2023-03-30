@@ -17,8 +17,8 @@ Observability load testing and simulation, under construction.
 | Name                              | Description                                                                 | Example                 | Default                                                      |
 |-----------------------------------|-----------------------------------------------------------------------------|-------------------------|--------------------------------------------------------------|
 | `METRICS_ADDR`                    | Address with metrics and pprof                                              | `localhost:9464`        | To prometheus addr                                           |
-| `GO_PPROF_ROUTES`                 | List of enabled pprof routes                                                | `cmdline,profile`       | profile, symbol, trace, goroutine, heap, threadcreate, block |
-| `OTEL_LOG_LEVEL`                  | Log level                                                                   |                         | `info`                                                       |
+| `PPROF_ROUTES`                    | List of enabled pprof routes                                                | `cmdline,profile`       | profile, symbol, trace, goroutine, heap, threadcreate, block |
+| `OTEL_LOG_LEVEL`                  | Log level                                                                   | `debug`                 | `info`                                                       |
 | `OTEL_EXPORTER_PROMETHEUS_HOST`   | Host of prometheus addr                                                     | `0.0.0.0`               | `localhost`                                                  |
 | `OTEL_EXPORTER_PROMETHEUS_PORT`   | Port of prometheus addr                                                     | `9090`                  | `9464`                                                       |
 | `OTEL_METRICS_EXPORTER`           | Metrics exporter to use                                                     | `prometheus`            | `none`                                                       |

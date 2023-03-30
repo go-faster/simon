@@ -85,7 +85,7 @@ func (m *Metrics) shutdown(ctx context.Context) error {
 
 func (m *Metrics) registerProfiler() {
 	var routes []string
-	if v := os.Getenv("GO_PPROF_ROUTES"); v != "" {
+	if v := os.Getenv("PPROF_ROUTES"); v != "" {
 		routes = strings.Split(v, ",")
 	}
 	if len(routes) == 1 && routes[0] == "none" {
@@ -111,6 +111,7 @@ func (m *Metrics) registerProfiler() {
 	m.lg.Info("Registering pprof routes", zap.Strings("routes", routes))
 	m.mux.HandleFunc("/debug/pprof/", pprof.Index)
 	for _, name := range routes {
+		name = strings.TrimSpace(name)
 		route := path.Join("/debug/pprof/", name)
 		switch name {
 		case "cmdline":
