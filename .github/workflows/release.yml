@@ -67,6 +67,11 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: goreleaser-install
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          install-only: true
+
       - name: goreleaser-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
