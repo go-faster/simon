@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: sigstore/cosign-installer@v3.0.1
       - uses: anchore/sbom-action/download-syft@v0
       - uses: arduino/setup-task@v1
         with:
@@ -75,6 +76,8 @@ jobs:
           install-only: true
 
       - name: goreleaser-release
+        run: task goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: task goreleaser
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
