@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/go-faster/errors v0.6.1
-	github.com/go-faster/gh-archive-clickhouse v0.0.0-20230325190949-7e05992ed340
 	github.com/prometheus/client_golang v1.14.0
 	go.opentelemetry.io/contrib/propagators/jaeger v1.15.0
 	go.opentelemetry.io/otel v1.14.0
@@ -21,6 +20,7 @@ require (
 )
 
 require (
+	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
