@@ -36,13 +36,13 @@ jobs:
           go-version: "1.20.x"
           cache: false
 
-      - name: Get Go environment
+      - name: Go env
         id: go-env
         run: |
           echo "cache=$(go env GOCACHE)" >> $GITHUB_ENV
           echo "modcache=$(go env GOMODCACHE)" >> $GITHUB_ENV
 
-      - name: Set up cache
+      - name: Go cache
         uses: actions/cache@v3
         with:
           path: |
@@ -53,12 +53,14 @@ jobs:
             release-v2-${{ runner.os }}-go-
 
       - uses: actions/cache@v3
+        name: Releaser cache
         with:
           path: |
             ./dist/*.deb
             ./dist/*.rpm
             ./dist/*.apk
           key: ${{ github.ref }}
+
       - uses: sigstore/cosign-installer@v3.0.1
       - uses: anchore/sbom-action/download-syft@v0.13.3
 
