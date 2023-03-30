@@ -7,6 +7,10 @@ Observability load testing and simulation, under construction.
 - [ ] Metrics
 - [ ] Traces
 - [ ] Profiling
+- [ ] Health checks
+  - [ ] Liveness
+  - [ ] Readiness
+  - [ ] Other probes
 
 ## Deployment
 - [ ] Kubernetes deployment
