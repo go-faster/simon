@@ -34,6 +34,7 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.description=Description"
   - use: buildx
     goos: linux
     goarch: arm64
@@ -46,6 +47,7 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.description=Description"
   - use: buildx
     goos: linux
     goarch: riscv64
@@ -62,6 +64,7 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.description=Description"
 docker_manifests:
   # https://goreleaser.com/customization/docker_manifest/
   - name_template: "{{ .Env.IMAGE }}:{{ .Version }}"
