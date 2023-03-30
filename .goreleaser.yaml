@@ -20,6 +20,22 @@ builds:
       - riscv64
     main: ./cmd/simon
 
+archives:
+  - name_template: >-
+      {{ .ProjectName }}-
+      {{- title .Os }}-
+      {{- .Arch  }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    builds_info:
+      group: root
+      owner: root
+    rlcp: true
+    files:
+      - README.md
+      - LICENSE
+
 dockers:
   # https://goreleaser.com/customization/docker/
   - use: buildx
