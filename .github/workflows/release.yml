@@ -5,21 +5,19 @@ on:
     branches: [main]
     tags: ['v*']
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DOCKER_CLI_EXPERIMENTAL: "enabled"
 
 jobs:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    env:
-      DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - uses: arduino/setup-task@v1
         with:
@@ -39,7 +37,6 @@ jobs:
         run: |
           echo "cache=$(go env GOCACHE)" >> $GITHUB_ENV
           echo "modcache=$(go env GOMODCACHE)" >> $GITHUB_ENV
-          echo "lintcache=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
 
       - name: Set up cache
         uses: actions/cache@v3
@@ -47,10 +44,9 @@ jobs:
           path: |
             ${{ env.cache }}
             ${{ env.modcache }}
-            ${{ env.lintcache }}
-          key: lint-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: release-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            lint-${{ runner.os }}-go-
+            release-${{ runner.os }}-go-
 
       - uses: actions/cache@v3
         with:
