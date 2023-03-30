@@ -10,12 +10,7 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v3
-      - name: Dependency Review
+      - name: 'Dependency Review'
         uses: actions/dependency-review-action@v3
         with:
-          allow-licenses:
-            - BSD-2-Clause
-            - BSD-3-Clause
-            - MIT
-            - Apache-2.0
-            - MPL-2.0
+          allow-licenses: BSD-2-Clause, BSD-3-Clause, MIT, Apache-2.0, MPL-2.0
