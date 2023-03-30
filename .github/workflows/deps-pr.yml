@@ -1,4 +1,4 @@
-name: dep-pr
+name: deps-pr
 
 on:
   pull_request:

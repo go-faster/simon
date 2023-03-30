@@ -1,8 +1,11 @@
-name: dep-main
+name: deps
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
