@@ -89,6 +89,9 @@ changelog:
       - '^chore(dep):'
       - '^test:'
 
+sboms:
+  - artifacts: archive
+
 nfpms:
   - package_name: go-faster-simon
     homepage: https://github.com/go-faster/simon
