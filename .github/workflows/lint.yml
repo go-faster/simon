@@ -1,4 +1,4 @@
-name: Lint
+name: lint
 on:
   push:
     branches: [main]
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  golangci-lint:
+  golangci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
           skip-build-cache: true
 
   # Check if there are any dirty changes after go mod tidy
-  check-mod:
+  mod:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
