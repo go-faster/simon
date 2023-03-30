@@ -10,73 +10,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  images:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    env:
-      KUBECONFIG: /tmp/kubeconfig
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.20.x
-          cache: false
-
-      - name: Get Go environment
-        id: go-env
-        run: |
-          echo "cache=$(go env GOCACHE)" >> $GITHUB_ENV
-          echo "modcache=$(go env GOMODCACHE)" >> $GITHUB_ENV
-
-      - name: Set up cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.cache }}
-            ${{ env.modcache }}
-          key: release-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            release-${{ runner.os }}-go-
-
-      - name: Docker log in
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Image metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
-            type=edge,branch=main
-            type=sha
-
-      - name: Go build
-        env:
-          CGO_ENABLED: 0
-        run: go build -v ./cmd/gh-archived
-
-      - name: Image build
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  goreleaser:
-    runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
@@ -91,9 +28,30 @@ jobs:
 
       - uses: docker/setup-buildx-action@v2
 
-      - uses: actions/setup-go@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v4
         with:
-          go-version: stable
+          go-version: "1.20.x"
+          cache: false
+
+      - name: Get Go environment
+        id: go-env
+        run: |
+          echo "cache=$(go env GOCACHE)" >> $GITHUB_ENV
+          echo "modcache=$(go env GOMODCACHE)" >> $GITHUB_ENV
+          echo "lintcache=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
+
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.cache }}
+            ${{ env.modcache }}
+            ${{ env.lintcache }}
+          key: lint-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            lint-${{ runner.os }}-go-
 
       - uses: actions/cache@v3
         with:
