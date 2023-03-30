@@ -32,7 +32,7 @@ jobs:
             ${{ env.cache }}
             ${{ env.modcache }}
             ${{ env.lintcache }}
-          key: lint-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/.go') }}
+          key: lint-${{ runner.os }}-go-${{ hashFiles('.goreleaser.yaml') }}-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/*.go') }}
           restore-keys: |
             lint-${{ runner.os }}-go-
 
