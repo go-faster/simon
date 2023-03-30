@@ -90,7 +90,7 @@ nfpms:
   - package_name: go-faster-simon
     homepage: https://github.com/go-faster/simon
     maintainer: Aleksandr Razumov <ernado@go-faster.org>
-    description: Set of services to
+    description: Set of observability testing services
     license: Apache 2.0
     formats:
       - apk
