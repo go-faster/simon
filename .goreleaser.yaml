@@ -23,7 +23,7 @@ builds:
 archives:
   - name_template: >-
       {{ .ProjectName }}-
-      {{- title .Os }}-
+      {{- .Os }}-
       {{- .Arch  }}
     format_overrides:
       - goos: windows
