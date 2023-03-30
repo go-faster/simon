@@ -2,10 +2,15 @@
 
 Observability load testing and simulation, under construction.
 
+## Observability
 - [ ] Logs
 - [ ] Metrics
 - [ ] Traces
 - [ ] Profiling
+
+## Deployment
+- [ ] Kubernetes deployment
+- [ ] Helm chart
 
 ## Environment variables
 
