@@ -23,3 +23,8 @@ hosts.*.txt
 /languages
 /repos_without_languages_cnt.csv.zst
 /repos_without_languages_cnt.csv
+
+# goreleaser
+dist
+simon
+coverage.txt

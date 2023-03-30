@@ -204,16 +204,26 @@ func prometheusAddr() string {
 	return net.JoinHostPort(host, port)
 }
 
+const (
+	writerStdout = "stdout"
+	writerStderr = "stderr"
+)
+
 func writerByName(name string) io.Writer {
 	switch name {
-	case "stdout":
+	case writerStdout:
 		return os.Stdout
-	case "stderr":
+	case writerStderr:
 		return os.Stderr
 	default:
 		return io.Discard
 	}
 }
+
+const (
+	EnvMetricsAddr         = "METRICS_ADDR"
+	EnvOTELMetricsExporter = "OTEL_METRICS_EXPORTER"
+)
 
 func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	addr := prometheusAddr()
