@@ -135,6 +135,7 @@ docker_signs:
     args:
       - '--key'
       - 'env://COSIGN_PRIVATE_KEY'
+      - 'sign'
       - '${artifact}@${digest}'
       - --yes
 
