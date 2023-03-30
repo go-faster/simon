@@ -1,4 +1,4 @@
-name: dependency
+name: dep-pr
 
 on:
   pull_request:

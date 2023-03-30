@@ -1,4 +1,4 @@
-name: dependency
+name: dep-main
 
 on:
   push:
