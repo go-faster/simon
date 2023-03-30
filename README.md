@@ -5,7 +5,7 @@ Observability load testing and simulation, under construction.
 Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
 
 ## Observability
-- [ ] Logs
+- [x] Logs
 - [ ] Metrics
 - [ ] Traces
 - [ ] Profiling
