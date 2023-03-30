@@ -39,7 +39,6 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -49,7 +48,6 @@ linters:
     - gocritic
     - gofmt
     - goimports
-    - golint
     - gosec
     - gosimple
     - govet
@@ -58,16 +56,14 @@ linters:
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
-    - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
     - gochecknoglobals
     - gocognit
+    - revive
 
   # Do not enable:
   # - wsl       (too opinionated about newlines)
@@ -93,6 +89,10 @@ issues:
       linters: [lll]
 
     # Disable linters that are annoying in tests.
+    - path: internal/app/metrics.go
+      linters: [goconst]
+
+    # Disable linters that are annoying in tests.
     - path: _test\.go
       linters:
         - gocyclo
@@ -111,3 +111,6 @@ issues:
 
     - text: "should have.+comment"
       linters: [golint]
+
+    - text: "_\\S+ is a global variable"
+      linters: [gochecknoglobals]

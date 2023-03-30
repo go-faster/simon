@@ -12,6 +12,7 @@ import (
 	"path"
 	rpprof "runtime/pprof"
 	"strings"
+	"time"
 
 	"github.com/go-faster/errors"
 	promClient "github.com/prometheus/client_golang/prometheus"
@@ -220,11 +221,6 @@ func writerByName(name string) io.Writer {
 	}
 }
 
-const (
-	EnvMetricsAddr         = "METRICS_ADDR"
-	EnvOTELMetricsExporter = "OTEL_METRICS_EXPORTER"
-)
-
 func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	addr := prometheusAddr()
 	if v := os.Getenv("METRICS_ADDR"); v != "" {
@@ -241,8 +237,11 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		resource: res,
 		mux:      mux,
 		srv: &http.Server{
-			Handler: mux,
-			Addr:    addr,
+			Handler:           mux,
+			Addr:              addr,
+			ReadHeaderTimeout: time.Second,
+			ReadTimeout:       time.Second,
+			WriteTimeout:      time.Second,
 		},
 	}
 

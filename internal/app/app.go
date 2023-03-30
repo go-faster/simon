@@ -30,7 +30,7 @@ const (
 // Run f until interrupt.
 //
 // If errors.Is(err, ctx.Err()) is valid for returned error, shutdown is considered graceful.
-// Context is cancelled on SIGINT. After watchdogTimeout application is forcefully terminated
+// Context is canceled on SIGINT. After watchdogTimeout application is forcefully terminated
 // with exitCodeWatchdog.
 func Run(f func(ctx context.Context, lg *zap.Logger, m *Metrics) error) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -62,7 +62,7 @@ func Run(f func(ctx context.Context, lg *zap.Logger, m *Metrics) error) {
 		defer lg.Info("Shutting down")
 		if err := f(ctx, lg, m); err != nil {
 			if errors.Is(err, ctx.Err()) {
-				// Parent context got cancelled, error is expected.
+				// Parent context got canceled, error is expected.
 				lg.Debug("Graceful shutdown")
 				return nil
 			}

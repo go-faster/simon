@@ -1,3 +1,4 @@
+// Package otelenv provides helpers for working with OTEL_RESOURCE_ATTRIBUTES.
 package otelenv
 
 import (
