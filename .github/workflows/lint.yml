@@ -41,7 +41,6 @@ jobs:
         with:
           version: latest
           args: --timeout 5m
-          skip-go-installation: true
           skip-pkg-cache: true
           skip-build-cache: true
 
