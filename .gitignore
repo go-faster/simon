@@ -28,3 +28,4 @@ hosts.*.txt
 dist
 simon
 coverage.txt
+.task
