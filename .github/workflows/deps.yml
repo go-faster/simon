@@ -1,0 +1,29 @@
+name: deps
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v3
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          base_ref: HEAD
+          head_ref: HEAD
+          allow-licenses:
+            - BSD-2-Clause
+            - BSD-3-Clause
+            - MIT
+            - Apache-2.0
+            - MPL-2.0
