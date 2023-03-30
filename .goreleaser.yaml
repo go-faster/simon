@@ -37,6 +37,17 @@ archives:
     files:
       - README.md
       - LICENSE
+      - cosign.pub
+
+release:
+  prerelease: allow # remove this when we start publishing non-prerelease or set to auto
+  draft: true # allow for manual edits
+  github:
+    owner: go-faster
+    name: simon
+
+  extra_files:
+    - glob: "cosign.pub"
 
 dockers:
   # https://goreleaser.com/customization/docker/
@@ -116,7 +127,25 @@ docker_manifests:
 
 signs:
   - cmd: cosign
+    id: cosign
+    ids: [cosign]
     certificate: '${artifact}.pem'
+    output: true
+    artifacts: binary
+    args:
+      - sign-blob
+      - '--key'
+      - 'env://COSIGN_PRIVATE_KEY'
+      - '--output-certificate=${certificate}'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+      - --yes
+
+  - cmd: cosign
+    id: cosign-keyless
+    ids: [cosign]
+    signature: "${artifact}-keyless.sig"
+    certificate: "${artifact}-keyless.pem"
     output: true
     artifacts: checksum
     args:
