@@ -13,11 +13,17 @@ spec:
           name: metrics
       env:
         - name: OTEL_METRICS_EXPORTER
-          value: prometheus
+          value: "prometheus"
         - name: OTEL_EXPORTER_PROMETHEUS_PORT
           value: "8090"
         - name: OTEL_EXPORTER_PROMETHEUS_HOST
           value: "0.0.0.0"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=simon,service.namespace=go-faster"
+        - name: OTEL_LOG_LEVEL
+          value: "DEBUG"
+        - name: OTEL_TRACES_EXPORTER
+          value: "stderr"
       resources:
         requests:
           memory: "64Mi"
