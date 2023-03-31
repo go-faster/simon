@@ -26,7 +26,10 @@ func cmdServer() *cobra.Command {
 				if addr == "" {
 					addr = "localhost:8080"
 				}
-				h, err := oas.NewServer(server.Server{})
+				h, err := oas.NewServer(server.Server{},
+					oas.WithMeterProvider(m.MeterProvider()),
+					oas.WithTracerProvider(m.TracerProvider()),
+				)
 				if err != nil {
 					return err
 				}
