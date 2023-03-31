@@ -38,6 +38,8 @@ docker run -i -t ghcr.io/go-faster/simon:latest
 
 ### Pod
 
+See [pod.yml](./_deploy/pod.yml).
+
 ```console
 kubectl apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
 ```
