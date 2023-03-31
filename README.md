@@ -15,7 +15,7 @@ Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
   - [ ] Other probes
 
 ## Deployment
-- [ ] Kubernetes deployment
+- [x] Kubernetes deployment
 - [ ] Helm chart
 
 ## Run
@@ -38,10 +38,8 @@ docker run -i -t ghcr.io/go-faster/simon:latest
 
 ### Pod
 
-See [pod.yml](./_deploy/pod.yml).
-
 ```console
-kubectl apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
+kubectl -n sandbox apply -f _deploy/
 ```
 
 ## Environment variables

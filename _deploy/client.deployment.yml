@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        image: ghcr.io/go-faster/simon:latest
+        args:
+          - "client"
+        ports:
+          - containerPort: 8090
+            protocol: TCP
+            name: metrics
+        env:
+          - name: SERVER_ADDR
+            value: "http://server"
+          - name: OTEL_METRICS_EXPORTER
+            value: "prometheus"
+          - name: OTEL_EXPORTER_PROMETHEUS_PORT
+            value: "8090"
+          - name: OTEL_EXPORTER_PROMETHEUS_HOST
+            value: "0.0.0.0"
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: "service.name=client,service.namespace=go-faster.simon"
+          - name: OTEL_LOG_LEVEL
+            value: "DEBUG"
+          - name: OTEL_TRACES_EXPORTER
+            value: "jaeger"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
