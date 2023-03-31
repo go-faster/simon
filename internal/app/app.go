@@ -58,7 +58,13 @@ func Run(f func(ctx context.Context, lg *zap.Logger, m *Metrics) error) {
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
-	g.Go(func() error {
+	g.Go(func() (rerr error) {
+		defer func() {
+			if r := recover(); r != nil {
+				rerr = errors.Errorf("panic: %v", r)
+			}
+		}()
+
 		defer lg.Info("Shutting down")
 		if err := f(ctx, lg, m); err != nil {
 			if errors.Is(err, ctx.Err()) {
