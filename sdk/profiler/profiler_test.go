@@ -40,7 +40,6 @@ func TestHandler_ServeHTTP(t *testing.T) {
 	require.NotNil(t, h)
 	s := httptest.NewServer(h)
 	t.Cleanup(s.Close)
-
 	t.Run("Found", func(t *testing.T) {
 		for _, v := range []string{
 			"/debug/pprof",
