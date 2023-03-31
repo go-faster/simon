@@ -58,7 +58,7 @@ func New(opt Options) http.Handler {
 	if unknown == nil {
 		unknown = func(route string) {}
 	}
-	for _, name := range opt.Routes {
+	for _, name := range routes {
 		name = strings.TrimSpace(name)
 		route := path.Join("/debug/pprof/", name)
 		switch name {

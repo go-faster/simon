@@ -41,10 +41,32 @@ func TestHandler_ServeHTTP(t *testing.T) {
 	s := httptest.NewServer(h)
 	t.Cleanup(s.Close)
 
-	req, err := http.NewRequest(http.MethodGet, s.URL+"/debug/pprof/", nil)
-	require.NoError(t, err)
+	t.Run("Found", func(t *testing.T) {
+		for _, v := range []string{
+			"/debug/pprof",
+			"/debug/pprof/symbol",
+			"/debug/pprof/goroutine",
+		} {
+			req, err := http.NewRequest(http.MethodGet, s.URL+v, http.NoBody)
+			require.NoError(t, err)
 
-	res, err := s.Client().Do(req)
-	require.NoErrorf(t, err, "request: %s", req.URL)
-	require.Equalf(t, http.StatusOK, res.StatusCode, "status: %s", res.Status)
+			res, err := s.Client().Do(req)
+			require.NoErrorf(t, err, "request: %s", req.URL)
+			require.Equalf(t, http.StatusOK, res.StatusCode, "%s: %s", v, res.Status)
+		}
+	})
+	t.Run("NotFound", func(t *testing.T) {
+		for _, v := range []string{
+			"/",
+			"/debug/pprof/foo",
+			"/debug/pprof/cmdline",
+		} {
+			req, err := http.NewRequest(http.MethodGet, s.URL+v, http.NoBody)
+			require.NoError(t, err)
+
+			res, err := s.Client().Do(req)
+			require.NoErrorf(t, err, "request: %s", req.URL)
+			require.Equalf(t, http.StatusNotFound, res.StatusCode, "%s: %s (should be not found)", v, res.Status)
+		}
+	})
 }
