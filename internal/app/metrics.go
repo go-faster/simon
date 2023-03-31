@@ -271,7 +271,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdkmetric.WithResource(res),
 			sdkmetric.WithReader(promExporter),
 		)
-	case "stdout", "stderr":
+	case writerStdout, writerStderr:
 		lg.Info(fmt.Sprintf("Using %s periodic metric exporter", exporter))
 		enc := json.NewEncoder(writerByName(exporter))
 		exp, err := stdoutmetric.New(stdoutmetric.WithEncoder(enc))
@@ -305,7 +305,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdktrace.WithResource(res),
 			sdktrace.WithBatcher(jaegerExporter),
 		)
-	case "stdout", "stderr":
+	case writerStdout, writerStderr:
 		lg.Info(fmt.Sprintf("Using %s traces exporter", exporter))
 		stdoutExporter, err := stdouttrace.New(stdouttrace.WithWriter(writerByName(exporter)))
 		if err != nil {
