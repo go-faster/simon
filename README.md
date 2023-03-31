@@ -36,7 +36,7 @@ $ docker run -i -t ghcr.io/go-faster/simon:latest
 ### Pod
 
 ```console
-$ kubectl -n sandbox apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
+$ kubectl apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
 ```
 
 ## Environment variables
