@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simon
+spec:
+  containers:
+    - name: api
+      image: ghcr.io/go-faster/simon:latest
+      ports:
+        - containerPort: 8090
+          protocol: TCP
+          name: metrics
+      env:
+        - name: OTEL_METRICS_EXPORTER
+          value: prometheus
+        - name: OTEL_EXPORTER_PROMETHEUS_PORT
+          value: "8090"
+        - name: OTEL_EXPORTER_PROMETHEUS_HOST
+          value: "0.0.0.0"
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "250m"
