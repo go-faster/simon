@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/go-faster/simon/internal/app"
-	"github.com/go-faster/simon/internal/otelenv"
+	"github.com/go-faster/simon/sdk/otelenv"
 )
 
 func Root() *cobra.Command {
