@@ -92,16 +92,17 @@ dockers:
   - use: buildx
     goos: linux
     goarch: riscv64
-    # riscv64 architecture support for static images
-    # https://github.com/go-riscv/distroless
-    # https://github.com/GoogleContainerTools/distroless/issues/1269
-    dockerfile: riscv64.Dockerfile
     image_templates:
       - "{{ .Env.IMAGE }}:{{ .Version }}-riscv64"
       - "{{ .Env.IMAGE }}:latest-riscv64"
     build_flag_templates:
       - "--platform=linux/riscv64"
       - "--pull"
+      # riscv64 architecture support for static images
+      # https://github.com/go-riscv/distroless
+      # https://github.com/GoogleContainerTools/distroless/issues/1269
+      - "--build-arg"
+      - "IMG=ghcr.io/go-riscv/distroless/static-unstable"
       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/go-faster/simon/main/README.md"
       - "--label=io.artifacthub.package.logo-url=https://avatars.githubusercontent.com/u/93744681?"
       - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Aleksandr Razumov\",\"email\":\"ernado@go-faster.org\"}]"
