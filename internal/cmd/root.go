@@ -42,6 +42,7 @@ func Root() *cobra.Command {
 	}
 	cmd.AddCommand(
 		cmdServer(),
+		cmdClient(),
 	)
 	return cmd
 }
