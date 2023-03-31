@@ -22,7 +22,10 @@ Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
 
 ### Docker
 ```console
-$ docker run -i -t ghcr.io/go-faster/simon:latest
+docker run -i -t ghcr.io/go-faster/simon:latest
+```
+
+```console
 {"level":"info","ts":1680181590.1318264,"logger":"metrics","caller":"app/metrics.go:286","msg":"No metrics exporter is configured by OTEL_METRICS_EXPORTER"}
 {"level":"info","ts":1680181590.134922,"logger":"metrics","caller":"app/metrics.go:319","msg":"No traces exporter is configured by OTEL_TRACES_EXPORTER"}
 {"level":"info","ts":1680181590.1362665,"logger":"metrics","caller":"app/metrics.go:356","msg":"Propagators configured","propagators":["tracecontext","baggage"]}
@@ -36,7 +39,7 @@ $ docker run -i -t ghcr.io/go-faster/simon:latest
 ### Pod
 
 ```console
-$ kubectl apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
+kubectl apply -f https://raw.githubusercontent.com/go-faster/simon/main/_deploy/pod.yml
 ```
 
 ## Environment variables
