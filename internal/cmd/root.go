@@ -17,7 +17,7 @@ func Root() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "simon",
 		Short: "Simon is Observability Workloads Simulator",
-		PreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if os.Getenv("OTEL_RESOURCE_ATTRIBUTES") == "" && os.Getenv("OTEL_SERVICE_NAME") == "" {
 				// Set default service name and namespace.
 				otelenv.Set(
@@ -40,6 +40,8 @@ func Root() *cobra.Command {
 			})
 		},
 	}
-
+	cmd.AddCommand(
+		cmdServer(),
+	)
 	return cmd
 }
