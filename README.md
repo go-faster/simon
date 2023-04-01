@@ -60,10 +60,17 @@ kubectl -n sandbox apply -f _deploy/
 | `OTEL_PROPAGATORS`                | OTEL Propagators (only tracecontext and baggage supported, none to disable) | `none`                  | `tracecontext,baggage`                                       |
 
 
-### Metrics addr
+### metrics addr
 
-|             |                                |
+| Value       | `METRICS_ADDR`                 |
 |-------------|--------------------------------|
 | Default     | `localhost:9464`               |
 | Description | Address with metrics and pprof |
 | Example     | `0.0.0.0:9464`                 |
+
+### pprof routes
+
+| Value       | `PPROF_ROUTES`                                               |
+|-------------|--------------------------------------------------------------|
+| Default     | profile, symbol, trace, goroutine, heap, threadcreate, block |
+| Description | List of enabled pprof routes                                 |
