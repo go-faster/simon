@@ -59,3 +59,11 @@ kubectl -n sandbox apply -f _deploy/
 | `OTEL_RESOURCE_ATTRIBUTES`        | OTEL Resource attributes                                                    | `service.namespace=pfm` |                                                              |
 | `OTEL_PROPAGATORS`                | OTEL Propagators (only tracecontext and baggage supported, none to disable) | `none`                  | `tracecontext,baggage`                                       |
 
+
+### Metrics addr
+
+|             |                                |
+|-------------|--------------------------------|
+| Default     | `localhost:9464`               |
+| Description | Address with metrics and pprof |
+| Example     | `0.0.0.0:9464`                 |
