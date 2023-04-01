@@ -35,7 +35,9 @@ spec:
           - name: OTEL_LOG_LEVEL
             value: "DEBUG"
           - name: OTEL_TRACES_EXPORTER
-            value: "jaeger"
+            value: "otlp"
+          - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+            value: "tempo-distributor.monitoring.svc.cluster.local:4317"
         resources:
           requests:
             memory: "64Mi"

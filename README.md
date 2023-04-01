@@ -60,6 +60,15 @@ kubectl -n sandbox apply -f _deploy/
 | `OTEL_PROPAGATORS`                | OTEL Propagators (only tracecontext and baggage supported, none to disable) | `none`                  | `tracecontext,baggage`                                       |
 
 
+| Environment variable                                                     | Option                        | Default value                                            |
+|--------------------------------------------------------------------------|-------------------------------|----------------------------------------------------------|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`       | `WithEndpoint` `WithInsecure` | `https://localhost:4317` or `https://localhost:4318`[^1] |
+| `OTEL_EXPORTER_OTLP_CERTIFICATE` `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE` | `WithTLSClientConfig`         |                                                          |
+| `OTEL_EXPORTER_OTLP_HEADERS` `OTEL_EXPORTER_OTLP_TRACES_HEADERS`         | `WithHeaders`                 |                                                          |
+| `OTEL_EXPORTER_OTLP_COMPRESSION` `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` | `WithCompression`             |                                                          |
+| `OTEL_EXPORTER_OTLP_TIMEOUT` `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`         | `WithTimeout`                 | `10s`                                                    |
+
+
 ### `METRICS_ADDR`
 
 | Value       | `METRICS_ADDR`                 |

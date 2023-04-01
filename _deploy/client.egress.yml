@@ -25,3 +25,11 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: tempo
+            io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP

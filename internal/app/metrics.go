@@ -18,6 +18,7 @@ import (
 	jaegerp "go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -30,6 +31,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Metrics implement common basic metrics and infrastructure to it.
@@ -248,6 +251,26 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		m.tracerProvider = sdktrace.NewTracerProvider(
 			sdktrace.WithResource(res),
 			sdktrace.WithBatcher(jaegerExporter),
+		)
+	case "otlp":
+		lg.Info("Using otlp exporter")
+		ctx, cancel := context.WithTimeout(ctx, time.Second)
+		defer cancel()
+		conn, err := grpc.DialContext(ctx, os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"),
+			// Note the use of insecure transport here. TLS is recommended in production.
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithBlock(),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		}
+		otlpExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		}
+		m.tracerProvider = sdktrace.NewTracerProvider(
+			sdktrace.WithResource(res),
+			sdktrace.WithBatcher(otlpExporter),
 		)
 	case writerStdout, writerStderr:
 		lg.Info(fmt.Sprintf("Using %s traces exporter", exporter))
