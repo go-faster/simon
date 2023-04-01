@@ -26,6 +26,6 @@ hosts.*.txt
 
 # goreleaser
 dist
-simon
 coverage.txt
 .task
+/simon
