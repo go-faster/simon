@@ -14,6 +14,8 @@ Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
   - [ ] Readiness
   - [ ] Other probes
 
+![hubble.png](_docs/hubble.png)
+
 ## Deployment
 - [x] Kubernetes deployment
 - [ ] Helm chart
@@ -89,3 +91,5 @@ See [General SDK Configuration][general-sdk] for OpenTelemetry.
 |-------------|--------------------------------------------------------------|
 | Default     | profile, symbol, trace, goroutine, heap, threadcreate, block |
 | Description | List of enabled pprof routes                                 |
+
+s
