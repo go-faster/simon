@@ -39,7 +39,7 @@ spec:
           - name: OTEL_EXPORTER_PROMETHEUS_HOST
             value: "0.0.0.0"
           - name: OTEL_RESOURCE_ATTRIBUTES
-            value: "service.name=server.simon.client"
+            value: "service.name=go-faster.simon.server"
           - name: OTEL_LOG_LEVEL
             value: "DEBUG"
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
