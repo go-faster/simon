@@ -13,6 +13,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/go-faster/simon/internal/app"
+	"github.com/go-faster/simon/internal/middleware"
 	"github.com/go-faster/simon/internal/oas"
 	"github.com/go-faster/simon/internal/server"
 )
@@ -36,16 +37,17 @@ func cmdServer() *cobra.Command {
 				}
 
 				spanNameFormatter := app.NewSpanNameFormatter(h)
+				instrumentedHandler := otelhttp.NewHandler(h, "",
+					otelhttp.WithSpanNameFormatter(spanNameFormatter),
+					otelhttp.WithMeterProvider(m.MeterProvider()),
+					otelhttp.WithTracerProvider(m.TracerProvider()),
+				)
 				s := &http.Server{
 					Addr:              addr,
 					ReadHeaderTimeout: time.Second,
 					WriteTimeout:      time.Second,
 					ReadTimeout:       time.Second,
-					Handler: otelhttp.NewHandler(h, "",
-						otelhttp.WithSpanNameFormatter(spanNameFormatter),
-						otelhttp.WithMeterProvider(m.MeterProvider()),
-						otelhttp.WithTracerProvider(m.TracerProvider()),
-					),
+					Handler:           middleware.Wrap(instrumentedHandler, m.LogMiddleware()),
 				}
 
 				lg.Info("Starting HTTP server", zap.String("addr", addr))

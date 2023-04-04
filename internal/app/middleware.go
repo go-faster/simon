@@ -46,6 +46,17 @@ func NewSpanNameFormatter(h Router) func(operation string, r *http.Request) stri
 	}
 }
 
+// LogMiddleware adds logger via zctx.With to request context.
+func (m *Metrics) LogMiddleware() middleware.Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			reqCtx := r.Context()
+			req := r.WithContext(zctx.With(reqCtx, m.lg))
+			next.ServeHTTP(w, req)
+		})
+	}
+}
+
 // TraceMiddleware returns new instrumented middleware.
 func (m *Metrics) TraceMiddleware() middleware.Middleware {
 	var (
