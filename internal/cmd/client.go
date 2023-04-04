@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/go-faster/errors"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 
 	"github.com/go-faster/simon/internal/app"
@@ -24,9 +26,18 @@ func cmdClient() *cobra.Command {
 				if addr == "" {
 					addr = "http://localhost:8080"
 				}
+				spanNameFormatter := app.NewSpanNameFormatter(&oas.Server{})
 				c, err := oas.NewClient(addr,
 					oas.WithMeterProvider(m.MeterProvider()),
 					oas.WithTracerProvider(m.TracerProvider()),
+					oas.WithClient(&http.Client{
+						Timeout: time.Second * 2,
+						Transport: otelhttp.NewTransport(http.DefaultTransport,
+							otelhttp.WithSpanNameFormatter(spanNameFormatter),
+							otelhttp.WithMeterProvider(m.MeterProvider()),
+							otelhttp.WithTracerProvider(m.TracerProvider()),
+						),
+					}),
 				)
 				if err != nil {
 					return errors.Wrap(err, "client")

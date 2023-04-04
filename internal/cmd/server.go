@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -33,12 +34,18 @@ func cmdServer() *cobra.Command {
 				if err != nil {
 					return err
 				}
+
+				spanNameFormatter := app.NewSpanNameFormatter(h)
 				s := &http.Server{
 					Addr:              addr,
 					ReadHeaderTimeout: time.Second,
 					WriteTimeout:      time.Second,
 					ReadTimeout:       time.Second,
-					Handler:           h,
+					Handler: otelhttp.NewHandler(h, "",
+						otelhttp.WithSpanNameFormatter(spanNameFormatter),
+						otelhttp.WithMeterProvider(m.MeterProvider()),
+						otelhttp.WithTracerProvider(m.TracerProvider()),
+					),
 				}
 
 				lg.Info("Starting HTTP server", zap.String("addr", addr))
