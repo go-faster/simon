@@ -251,20 +251,26 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	// OTEL configuration from environment.
 	//
 	// See https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/
+	const (
+		expOTLP       = "otlp"
+		expNone       = "none" // no-op
+		expPrometheus = "prometheus"
+		expJaeger     = "jaeger"
+
+		protoHTTP    = "http"
+		protoGRPC    = "grpc"
+		defaultProto = protoGRPC
+	)
 
 	// Metrics exporter.
-	const (
-		expOpenTelemetry = "otlp"
-		expNone          = "none" // no-op
-	)
-	switch exporter := strings.TrimSpace(getEnvOr("OTEL_METRICS_EXPORTER", expOpenTelemetry)); exporter {
-	case "prometheus":
+	switch exporter := strings.TrimSpace(getEnvOr("OTEL_METRICS_EXPORTER", expOTLP)); exporter {
+	case expPrometheus:
 		lg.Info("Using prometheus exporter")
 		reg := promClient.NewPedanticRegistry()
 		exp, err := prometheus.New(
 			prometheus.WithRegisterer(reg),
 		)
-		m.registerShutdown("prometheus", exp.Shutdown)
+		m.registerShutdown(exporter, exp.Shutdown)
 		if err != nil {
 			return nil, errors.Wrap(err, "prometheus")
 		}
@@ -279,16 +285,17 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdkmetric.WithResource(res),
 			sdkmetric.WithReader(exp),
 		)
-	case expOpenTelemetry:
+	case expOTLP:
 		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
 		if proto == "" {
 			proto = os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
 		}
 		if proto == "" {
-			proto = "grpc"
+			proto = defaultProto
 		}
+		lg.Info("Using otlp metrics exporter", zap.String("protocol", proto))
 		switch proto {
-		case "grpc":
+		case protoHTTP:
 			exp, err := otlpmetricgrpc.New(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
@@ -298,7 +305,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 				sdkmetric.WithResource(res),
 				sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exp)),
 			)
-		case "http":
+		case protoGRPC:
 			exp, err := otlpmetrichttp.New(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
@@ -331,8 +338,8 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	}
 
 	// Traces exporter.
-	switch exporter := getEnvOr(os.Getenv("OTEL_TRACES_EXPORTER"), "oltp"); exporter {
-	case "jaeger":
+	switch exporter := strings.TrimSpace(getEnvOr("OTEL_TRACES_EXPORTER", expOTLP)); exporter {
+	case expJaeger:
 		lg.Info("Using jaeger exporter")
 		var jaegerOptions []jaeger.AgentEndpointOption
 		jaegerOptions = append(jaegerOptions,
@@ -347,16 +354,17 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdktrace.WithResource(res),
 			sdktrace.WithBatcher(exp),
 		)
-	case expOpenTelemetry:
+	case expOTLP:
 		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
 		if proto == "" {
 			proto = os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL")
 		}
 		if proto == "" {
-			proto = "grpc"
+			proto = defaultProto
 		}
+		lg.Info("Using otlp traces exporter", zap.String("protocol", proto))
 		switch proto {
-		case "grpc":
+		case protoGRPC:
 			exp, err := otlptracegrpc.New(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
@@ -366,7 +374,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 				sdktrace.WithResource(res),
 				sdktrace.WithBatcher(exp),
 			)
-		case "http":
+		case protoHTTP:
 			exp, err := otlptracehttp.New(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
