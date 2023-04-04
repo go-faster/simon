@@ -253,7 +253,11 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	// See https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/
 
 	// Metrics exporter.
-	switch exporter := getEnvOr("OTEL_METRICS_EXPORTER", "oltp"); exporter {
+	const (
+		expOpenTelemetry = "otlp"
+		expNone          = "none" // no-op
+	)
+	switch exporter := strings.TrimSpace(getEnvOr("OTEL_METRICS_EXPORTER", expOpenTelemetry)); exporter {
 	case "prometheus":
 		lg.Info("Using prometheus exporter")
 		reg := promClient.NewPedanticRegistry()
@@ -275,7 +279,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdkmetric.WithResource(res),
 			sdkmetric.WithReader(exp),
 		)
-	case "oltp":
+	case expOpenTelemetry:
 		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
 		if proto == "" {
 			proto = os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
@@ -319,7 +323,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdkmetric.WithResource(res),
 			sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exp)),
 		)
-	case "none":
+	case expNone:
 		lg.Info("No metrics exporter is configured by OTEL_METRICS_EXPORTER")
 		m.meterProvider = metric.NewNoopMeterProvider()
 	default:
@@ -343,7 +347,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdktrace.WithResource(res),
 			sdktrace.WithBatcher(exp),
 		)
-	case "otlp":
+	case expOpenTelemetry:
 		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
 		if proto == "" {
 			proto = os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL")
@@ -386,7 +390,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 			sdktrace.WithResource(res),
 			sdktrace.WithBatcher(exp),
 		)
-	case "none":
+	case expNone:
 		lg.Info("No traces exporter is configured by OTEL_TRACES_EXPORTER")
 		m.tracerProvider = trace.NewNoopTracerProvider()
 	default:
