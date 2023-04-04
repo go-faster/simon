@@ -13,6 +13,7 @@ spec:
         app: client
         app.kubernetes.io/part-of: simon
         app.kubernetes.io/component: client
+        service.opentelemetry.io/name: go-faster.simon.client
     spec:
       containers:
       - name: client
@@ -44,8 +45,8 @@ spec:
             value: "http://tempo-distributor.monitoring.svc.cluster.local:4317"
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: "32Mi"
+            cpu: "10m"
           limits:
-            memory: "128Mi"
-            cpu: "250m"
+            memory: "64Mi"
+            cpu: "100m"
