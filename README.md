@@ -44,6 +44,12 @@ kubectl -n sandbox apply -f _deploy/
 
 ## Environment variables
 
+
+See [General SDK Configuration][general-sdk] for OpenTelemetry.
+
+[general-sdk]: https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/
+
+
 | Name                              | Description                                                                 | Example                 | Default                                                      |
 |-----------------------------------|-----------------------------------------------------------------------------|-------------------------|--------------------------------------------------------------|
 | `METRICS_ADDR`                    | Address with metrics and pprof                                              | `localhost:9464`        | To prometheus addr                                           |

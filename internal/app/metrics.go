@@ -9,16 +9,21 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-faster/errors"
 	promClient "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	jaegerp "go.opentelemetry.io/contrib/propagators/jaeger"
+	"go.opentelemetry.io/contrib/instrumentation/runtime"
+	"go.opentelemetry.io/contrib/propagators/autoprop"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -29,10 +34,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Metrics implement common basic metrics and infrastructure to it.
@@ -48,6 +52,17 @@ type Metrics struct {
 	mux        *http.ServeMux
 	srv        *http.Server
 	propagator propagation.TextMapPropagator
+
+	shutdowns []shutdown
+}
+
+func (m *Metrics) registerShutdown(name string, fn func(ctx context.Context) error) {
+	m.shutdowns = append(m.shutdowns, shutdown{name: name, fn: fn})
+}
+
+type shutdown struct {
+	name string
+	fn   func(ctx context.Context) error
 }
 
 func (m *Metrics) String() string {
@@ -70,7 +85,7 @@ func (m *Metrics) run(ctx context.Context) error {
 		// Wait until g ctx canceled, then try to shut down server.
 		<-ctx.Done()
 
-		m.lg.Debug("Shutting down metrics server")
+		m.lg.Debug("Shutting down metrics")
 		ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 
@@ -81,7 +96,39 @@ func (m *Metrics) run(ctx context.Context) error {
 }
 
 func (m *Metrics) shutdown(ctx context.Context) error {
-	return m.srv.Shutdown(ctx)
+	var (
+		wg   sync.WaitGroup
+		l    sync.Mutex
+		errs []error
+	)
+
+	// Launch shutdowns in parallel.
+	wg.Add(len(m.shutdowns))
+	for _, s := range m.shutdowns {
+		var (
+			f = s.fn
+			n = s.name
+		)
+		go func() {
+			defer wg.Done()
+			if err := f(ctx); err != nil {
+				e := errors.Wrapf(err, "shutdown %s", n)
+				l.Lock()
+				errs = append(errs, e)
+				l.Unlock()
+			}
+		}()
+	}
+
+	// Wait for all shutdowns to finish.
+	wg.Wait()
+
+	// Combine all shutdown errors.
+	l.Lock()
+	err := multierr.Combine(errs...)
+	l.Unlock()
+
+	return err
 }
 
 func (m *Metrics) registerPrometheus() {
@@ -168,6 +215,13 @@ func writerByName(name string) io.Writer {
 	}
 }
 
+func getEnvOr(name, def string) string {
+	if v := os.Getenv(name); v != "" {
+		return v
+	}
+	return def
+}
+
 func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	addr := prometheusAddr()
 	if v := os.Getenv("METRICS_ADDR"); v != "" {
@@ -192,32 +246,67 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		},
 	}
 
+	m.registerShutdown("http", m.srv.Shutdown)
+
 	// OTEL configuration from environment.
 	//
 	// See https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/
 
 	// Metrics exporter.
-	switch exporter := os.Getenv("OTEL_METRICS_EXPORTER"); exporter {
+	switch exporter := getEnvOr("OTEL_METRICS_EXPORTER", "oltp"); exporter {
 	case "prometheus":
 		lg.Info("Using prometheus exporter")
-		registry := promClient.NewPedanticRegistry()
-		promExporter, err := prometheus.New(
-			prometheus.WithRegisterer(registry),
+		reg := promClient.NewPedanticRegistry()
+		exp, err := prometheus.New(
+			prometheus.WithRegisterer(reg),
 		)
+		m.registerShutdown("prometheus", exp.Shutdown)
 		if err != nil {
 			return nil, errors.Wrap(err, "prometheus")
 		}
 		// Register legacy prometheus-only runtime metrics for backward compatibility.
-		registry.MustRegister(
+		reg.MustRegister(
 			collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 			collectors.NewGoCollector(),
 			collectors.NewBuildInfoCollector(),
 		)
-		m.prometheus = registry
+		m.prometheus = reg
 		m.meterProvider = sdkmetric.NewMeterProvider(
 			sdkmetric.WithResource(res),
-			sdkmetric.WithReader(promExporter),
+			sdkmetric.WithReader(exp),
 		)
+	case "oltp":
+		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
+		if proto == "" {
+			proto = os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
+		}
+		if proto == "" {
+			proto = "grpc"
+		}
+		switch proto {
+		case "grpc":
+			exp, err := otlpmetricgrpc.New(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+			}
+			m.registerShutdown("otlp.metrics.grpc", exp.Shutdown)
+			m.meterProvider = sdkmetric.NewMeterProvider(
+				sdkmetric.WithResource(res),
+				sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exp)),
+			)
+		case "http":
+			exp, err := otlpmetrichttp.New(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+			}
+			m.registerShutdown("otlp.metrics.http", exp.Shutdown)
+			m.meterProvider = sdkmetric.NewMeterProvider(
+				sdkmetric.WithResource(res),
+				sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exp)),
+			)
+		default:
+			return nil, fmt.Errorf("unsupported metric otlp protocol %q", proto)
+		}
 	case writerStdout, writerStderr:
 		lg.Info(fmt.Sprintf("Using %s periodic metric exporter", exporter))
 		enc := json.NewEncoder(writerByName(exporter))
@@ -225,11 +314,12 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "stdout metric provider")
 		}
+		m.registerShutdown(exporter, exp.Shutdown)
 		m.meterProvider = sdkmetric.NewMeterProvider(
 			sdkmetric.WithResource(res),
 			sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exp)),
 		)
-	case "", "none":
+	case "none":
 		lg.Info("No metrics exporter is configured by OTEL_METRICS_EXPORTER")
 		m.meterProvider = metric.NewNoopMeterProvider()
 	default:
@@ -237,99 +327,82 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 	}
 
 	// Traces exporter.
-	switch exporter := os.Getenv("OTEL_TRACES_EXPORTER"); exporter {
+	switch exporter := getEnvOr(os.Getenv("OTEL_TRACES_EXPORTER"), "oltp"); exporter {
 	case "jaeger":
 		lg.Info("Using jaeger exporter")
 		var jaegerOptions []jaeger.AgentEndpointOption
 		jaegerOptions = append(jaegerOptions,
 			jaeger.WithLogger(zap.NewStdLog(lg.Named("jaeger"))),
 		)
-		jaegerExporter, err := jaeger.New(jaeger.WithAgentEndpoint(jaegerOptions...))
+		exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaegerOptions...))
 		if err != nil {
 			return nil, errors.Wrap(err, "jaeger")
 		}
+		m.registerShutdown(exporter, exp.Shutdown)
 		m.tracerProvider = sdktrace.NewTracerProvider(
 			sdktrace.WithResource(res),
-			sdktrace.WithBatcher(jaegerExporter),
+			sdktrace.WithBatcher(exp),
 		)
 	case "otlp":
-		lg.Info("Using otlp exporter")
-		ctx, cancel := context.WithTimeout(ctx, time.Second)
-		defer cancel()
-		conn, err := grpc.DialContext(ctx, os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"),
-			// Note the use of insecure transport here. TLS is recommended in production.
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			grpc.WithBlock(),
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		proto := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL")
+		if proto == "" {
+			proto = os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL")
 		}
-		otlpExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
-		if err != nil {
-			return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		if proto == "" {
+			proto = "grpc"
 		}
-		m.tracerProvider = sdktrace.NewTracerProvider(
-			sdktrace.WithResource(res),
-			sdktrace.WithBatcher(otlpExporter),
-		)
+		switch proto {
+		case "grpc":
+			exp, err := otlptracegrpc.New(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+			}
+			m.registerShutdown("otlp.traces", exp.Shutdown)
+			m.tracerProvider = sdktrace.NewTracerProvider(
+				sdktrace.WithResource(res),
+				sdktrace.WithBatcher(exp),
+			)
+		case "http":
+			exp, err := otlptracehttp.New(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+			}
+			m.registerShutdown("otlp.traces", exp.Shutdown)
+			m.tracerProvider = sdktrace.NewTracerProvider(
+				sdktrace.WithResource(res),
+				sdktrace.WithBatcher(exp),
+			)
+		default:
+			return nil, fmt.Errorf("unsupported traces otlp protocol %q", proto)
+		}
 	case writerStdout, writerStderr:
 		lg.Info(fmt.Sprintf("Using %s traces exporter", exporter))
-		stdoutExporter, err := stdouttrace.New(stdouttrace.WithWriter(writerByName(exporter)))
+		exp, err := stdouttrace.New(stdouttrace.WithWriter(writerByName(exporter)))
 		if err != nil {
 			return nil, errors.Wrap(err, "stdout")
 		}
+		m.registerShutdown(exporter, exp.Shutdown)
 		m.tracerProvider = sdktrace.NewTracerProvider(
 			sdktrace.WithResource(res),
-			sdktrace.WithBatcher(stdoutExporter),
+			sdktrace.WithBatcher(exp),
 		)
-	case "none", "":
+	case "none":
 		lg.Info("No traces exporter is configured by OTEL_TRACES_EXPORTER")
 		m.tracerProvider = trace.NewNoopTracerProvider()
 	default:
 		return nil, errors.Errorf("unsupported OTEL_TRACES_EXPORTER %q", exporter)
 	}
 
-	// Propagators.
-	propagators := "tracecontext,baggage" // default as per OTEL convention
-	if v := os.Getenv("OTEL_PROPAGATORS"); v != "" {
-		propagators = v
-	}
-	if propagators == "none" {
-		m.propagator = propagation.NewCompositeTextMapPropagator() // noop
-		m.lg.Info("Propagation is disabled by OTEL_PROPAGATORS")
-	} else {
-		var (
-			list           []propagation.TextMapPropagator
-			valid, invalid []string
-		)
-		for _, p := range strings.Split(propagators, ",") {
-			// See https://opentelemetry.io/docs/concepts/sdk-configuration/general-sdk-configuration/#otel_propagators
-			switch p {
-			case "tracecontext":
-				list = append(list, propagation.TraceContext{})
-			case "baggage":
-				list = append(list, propagation.Baggage{})
-			case "jaeger":
-				list = append(list, jaegerp.Jaeger{})
-			// TODO(ernado): support b3, b3multi?
-			default:
-				invalid = append(invalid, p)
-				continue
-			}
-			valid = append(valid, p)
-		}
-		m.propagator = propagation.NewCompositeTextMapPropagator(list...)
-		if len(valid) > 0 {
-			m.lg.Info("Propagators configured", zap.Strings("propagators", valid))
-		} else {
-			m.lg.Info("No propagators configured")
-		}
-		if len(invalid) > 0 {
-			m.lg.Warn("Unsupported propagators", zap.Strings("propagators.invalid", invalid))
-		}
-	}
+	// Automatically composited from the OTEL_PROPAGATORS environment variable.
+	m.propagator = autoprop.NewTextMapPropagator()
 
-	// TODO: Register OTEL runtime metrics.
+	// Setting up go runtime metrics.
+	if err := runtime.Start(
+		runtime.WithMeterProvider(m.MeterProvider()),
+		runtime.WithMinimumReadMemStatsInterval(time.Second), // export as env?
+	); err != nil {
+		return nil, errors.Wrap(err, "runtime metrics")
+	}
 
 	// Register global OTEL providers.
 	global.SetMeterProvider(m.MeterProvider())

@@ -24,6 +24,8 @@ spec:
         env:
           - name: SERVER_ADDR
             value: "http://server"
+          - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            value: "grpc"
           - name: OTEL_METRICS_EXPORTER
             value: "prometheus"
           - name: OTEL_EXPORTER_PROMETHEUS_PORT
