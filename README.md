@@ -6,8 +6,9 @@ Supported platforms: {linux, windows, darwin}-{amd64, arm64, **riscv64**}
 
 ## Observability
 - [x] Logs
-- [ ] Metrics
-- [ ] Traces
+- [x] Metrics
+- [x] Traces
+- [ ] Context propagation
 - [ ] Profiling
 - [ ] Health checks
   - [ ] Liveness

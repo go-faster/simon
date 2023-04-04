@@ -7,6 +7,6 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: client
+      app: server
   endpoints:
-    - port: server
+    - port: metrics
