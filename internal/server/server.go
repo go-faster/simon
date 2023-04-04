@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/go-faster/simon/internal/oas"
+	"github.com/go-faster/simon/sdk/zctx"
 )
 
 // Server implements oas.Handler.
@@ -12,7 +13,8 @@ type Server struct{}
 
 var _ oas.Handler = (*Server)(nil)
 
-func (s Server) Status(_ context.Context) (*oas.Status, error) {
+func (s Server) Status(ctx context.Context) (*oas.Status, error) {
+	zctx.From(ctx).Info("Status")
 	return &oas.Status{Message: "ok"}, nil
 }
 
