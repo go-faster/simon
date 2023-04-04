@@ -1,0 +1,58 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: client.to.server
+spec:
+  endpointSelector:
+    matchLabels:
+      app: client
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app: server
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              # TODO: use service.NAMESPACE.svc.cluster.local
+              - matchPattern: "server.*.svc.cluster.local"
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: client.to.metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app: client
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: tempo
+            io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchName: "tempo-distributor.monitoring.svc.cluster.local"

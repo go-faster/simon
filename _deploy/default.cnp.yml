@@ -1,0 +1,15 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default
+  labels:
+    app.kubernetes.io/part-of: simon
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: simon
+  ingress:
+    - {}
+  egress:
+    - {}

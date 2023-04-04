@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: client
+        app.kubernetes.io/part-of: simon
+        app.kubernetes.io/component: client
     spec:
       containers:
       - name: client

@@ -1,7 +1,10 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: server.ingress
+  name: server.from.client
+  labels:
+    app: server
 spec:
   endpointSelector:
     matchLabels:
@@ -14,6 +17,17 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: server.to.tracing
+  labels:
+    app: server
+spec:
+  endpointSelector:
+    matchLabels:
+      app: server
   egress:
     - toEndpoints:
         - matchLabels:
@@ -25,7 +39,7 @@ spec:
               protocol: UDP
           rules:
             dns:
-              - matchPattern: "*"
+              - matchName: "tempo-distributor.monitoring.svc.cluster.local"
     - toEndpoints:
         - matchLabels:
             app.kubernetes.io/instance: tempo
