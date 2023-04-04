@@ -15,6 +15,10 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+          rules:
+            http:
+              - method: "GET"
+                path: "/status"
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: kube-system

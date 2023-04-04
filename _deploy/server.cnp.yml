@@ -17,6 +17,10 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+          rules:
+            http:
+              - method: "GET"
+                path: "/status"
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
