@@ -298,7 +298,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		case protoHTTP:
 			exp, err := otlpmetricgrpc.New(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+				return nil, errors.Wrap(err, "failed to build grpc trace exporter")
 			}
 			m.registerShutdown("otlp.metrics.grpc", exp.Shutdown)
 			m.meterProvider = sdkmetric.NewMeterProvider(
@@ -308,7 +308,7 @@ func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
 		case protoGRPC:
 			exp, err := otlpmetrichttp.New(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+				return nil, errors.Wrap(err, "failed to build http trace exporter")
 			}
 			m.registerShutdown("otlp.metrics.http", exp.Shutdown)
 			m.meterProvider = sdkmetric.NewMeterProvider(
