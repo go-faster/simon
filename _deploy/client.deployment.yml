@@ -38,8 +38,8 @@ spec:
             value: "DEBUG"
           - name: OTEL_TRACES_EXPORTER
             value: "otlp"
-          - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-            value: "tempo-distributor.monitoring.svc.cluster.local:4317"
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://tempo-distributor.monitoring.svc.cluster.local:4317"
         resources:
           requests:
             memory: "64Mi"
