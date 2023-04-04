@@ -92,5 +92,3 @@ See [General SDK Configuration][general-sdk] for OpenTelemetry.
 |-------------|--------------------------------------------------------------|
 | Default     | profile, symbol, trace, goroutine, heap, threadcreate, block |
 | Description | List of enabled pprof routes                                 |
-
-s
