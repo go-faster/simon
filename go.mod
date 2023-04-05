@@ -7,7 +7,7 @@ require (
 	github.com/go-faster/jx v1.0.0
 	github.com/ogen-go/ogen v0.61.0
 	github.com/prometheus/client_golang v1.14.0
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.40.0
