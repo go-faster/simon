@@ -35,24 +35,25 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.20.x"
+          go-version: "1.20.3"
           cache: false
 
-      - name: Go env
+      - name: Get Go environment
         id: go-env
         run: |
           echo "cache=$(go env GOCACHE)" >> $GITHUB_ENV
           echo "modcache=$(go env GOMODCACHE)" >> $GITHUB_ENV
+          echo "goversion=$(go env GOVERSION)" >> $GITHUB_ENV
 
-      - name: Go cache
+      - name: Set up cache
         uses: actions/cache@v3
         with:
           path: |
             ${{ env.cache }}
             ${{ env.modcache }}
-          key: release-v2-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: release-${{ runner.os }}-go-${{ env.goversion }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            release-v2-${{ runner.os }}-go-
+            release-${{ runner.os }}-go-${{ env.goversion }}
 
       - uses: actions/cache@v3
         name: Releaser cache
