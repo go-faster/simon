@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.0
+	github.com/go-logr/zapr v1.2.3
 	github.com/ogen-go/ogen v0.62.0
 	github.com/prometheus/client_golang v1.15.0
 	github.com/spf13/cobra v1.7.0
