@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-faster/sdk/zctx"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/go-faster/simon/internal/middleware"
 	"github.com/go-faster/simon/internal/oas"
-	"github.com/go-faster/simon/sdk/zctx"
 )
 
 type writerProxy struct {
@@ -51,7 +51,7 @@ func (m *Metrics) LogMiddleware() middleware.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			reqCtx := r.Context()
-			req := r.WithContext(zctx.With(reqCtx, m.lg))
+			req := r.WithContext(zctx.Base(reqCtx, m.lg))
 			next.ServeHTTP(w, req)
 		})
 	}
@@ -95,8 +95,10 @@ func (m *Metrics) TraceMiddleware() middleware.Middleware {
 				fields = append(fields, f)
 				lgCtx = lgCtx.With(f)
 			}
-			lgReq := m.lg.With(fields...)
-			ctx = zctx.With(ctx, lgCtx)
+
+			ctx = zctx.Base(ctx, lgCtx)
+			ctx = zctx.With(ctx, fields...)
+			lgReq := zctx.From(ctx)
 
 			defer func() {
 				if r := recover(); r != nil {

@@ -4,8 +4,9 @@ package server
 import (
 	"context"
 
+	"github.com/go-faster/sdk/zctx"
+
 	"github.com/go-faster/simon/internal/oas"
-	"github.com/go-faster/simon/sdk/zctx"
 )
 
 // Server implements oas.Handler.

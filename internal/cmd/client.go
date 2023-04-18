@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
+	"github.com/go-faster/sdk/zctx"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 
 	"github.com/go-faster/simon/internal/app"
 	"github.com/go-faster/simon/internal/oas"
-	"github.com/go-faster/simon/sdk/zctx"
 )
 
 func cmdClient() *cobra.Command {

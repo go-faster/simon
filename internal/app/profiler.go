@@ -4,9 +4,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/go-faster/sdk/profiler"
 	"go.uber.org/zap"
-
-	"github.com/go-faster/simon/sdk/profiler"
 )
 
 func (m *Metrics) registerProfiler() {

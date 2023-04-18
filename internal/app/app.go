@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
+	"github.com/go-faster/sdk/zctx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sync/errgroup"
-
-	"github.com/go-faster/simon/sdk/zctx"
 )
 
 const (
@@ -50,7 +49,7 @@ func Run(f func(ctx context.Context, lg *zap.Logger, m *Metrics) error) {
 	}
 
 	// Add logger to root context.
-	ctx = zctx.With(ctx, lg)
+	ctx = zctx.Base(ctx, lg)
 
 	m, err := newMetrics(ctx, lg.Named("metrics"))
 	if err != nil {

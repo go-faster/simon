@@ -5,12 +5,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-faster/sdk/otelenv"
 	"github.com/spf13/cobra"
 	semconv "go.opentelemetry.io/otel/semconv/v1.18.0"
 	"go.uber.org/zap"
 
 	"github.com/go-faster/simon/internal/app"
-	"github.com/go-faster/simon/sdk/otelenv"
 )
 
 func Root() *cobra.Command {
