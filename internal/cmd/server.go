@@ -4,9 +4,12 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-faster/errors"
+	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
@@ -17,6 +20,19 @@ import (
 	"github.com/go-faster/simon/internal/oas"
 	"github.com/go-faster/simon/internal/server"
 )
+
+type zapCorsLogger struct {
+	lg *zap.SugaredLogger
+}
+
+func (z zapCorsLogger) Printf(s string, i ...interface{}) {
+	z.lg.Infof(strings.TrimSpace(s), i...)
+}
+
+func getEnvBool(k string) bool {
+	v, _ := strconv.ParseBool(os.Getenv(k))
+	return v
+}
 
 func cmdServer() *cobra.Command {
 	return &cobra.Command{
@@ -36,8 +52,22 @@ func cmdServer() *cobra.Command {
 					return err
 				}
 
+				allowedOrigins := []string{"*"}
+				if v := os.Getenv("CORS_ALLOWED_ORIGINS"); v != "" {
+					allowedOrigins = strings.Split(v, ",")
+				}
+
+				c := cors.New(cors.Options{
+					AllowedOrigins:   allowedOrigins,
+					AllowCredentials: getEnvBool("CORS_ALLOW_CREDENTIALS"),
+					Debug:            getEnvBool("CORS_DEBUG"),
+					MaxAge:           60, // seconds
+				})
+
+				c.Log = zapCorsLogger{lg: lg.Sugar()}
+
 				spanNameFormatter := app.NewSpanNameFormatter(h)
-				instrumentedHandler := otelhttp.NewHandler(h, "",
+				instrumentedHandler := otelhttp.NewHandler(c.Handler(h), "",
 					otelhttp.WithSpanNameFormatter(spanNameFormatter),
 					otelhttp.WithMeterProvider(m.MeterProvider()),
 					otelhttp.WithTracerProvider(m.TracerProvider()),
