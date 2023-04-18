@@ -190,8 +190,21 @@ func prometheusAddr() string {
 	return net.JoinHostPort(host, port)
 }
 
+type zapErrorHandler struct {
+	lg *zap.Logger
+}
+
+func (z zapErrorHandler) Handle(err error) {
+	z.lg.Error("Error", zap.Error(err))
+}
+
 func newMetrics(ctx context.Context, lg *zap.Logger) (*Metrics, error) {
-	otel.SetLogger(zapr.NewLogger(lg.Named("otel")))
+	{
+		// Setup global OTEL logger and error handler.
+		logger := lg.Named("otel")
+		otel.SetLogger(zapr.NewLogger(logger))
+		otel.SetErrorHandler(zapErrorHandler{lg: logger})
+	}
 
 	addr := prometheusAddr()
 	if v := os.Getenv("METRICS_ADDR"); v != "" {
