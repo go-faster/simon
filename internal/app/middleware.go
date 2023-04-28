@@ -9,23 +9,6 @@ import (
 	"github.com/go-faster/simon/internal/oas"
 )
 
-type writerProxy struct {
-	http.ResponseWriter
-
-	wrote  int64
-	status int
-}
-
-func (w *writerProxy) Write(bytes []byte) (n int, err error) {
-	n, err = w.ResponseWriter.Write(bytes)
-	w.wrote += int64(n)
-	return n, err
-}
-func (w *writerProxy) WriteHeader(statusCode int) {
-	w.ResponseWriter.WriteHeader(statusCode)
-	w.status = statusCode
-}
-
 type Router interface {
 	FindRoute(method, path string) (oas.Route, bool)
 }
