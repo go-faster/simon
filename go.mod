@@ -13,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.40.0
-	go.opentelemetry.io/contrib/propagators/autoprop v0.40.0
+	go.opentelemetry.io/contrib/propagators/autoprop v0.41.0
 	go.opentelemetry.io/otel v1.15.0
 	go.opentelemetry.io/otel/metric v0.38.0
 	go.opentelemetry.io/otel/sdk v1.15.0
@@ -46,10 +46,10 @@ require (
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	go.opentelemetry.io/contrib/propagators/aws v1.15.0 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.15.0 // indirect
-	go.opentelemetry.io/contrib/propagators/jaeger v1.15.0 // indirect
-	go.opentelemetry.io/contrib/propagators/ot v1.15.0 // indirect
+	go.opentelemetry.io/contrib/propagators/aws v1.16.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.16.0 // indirect
+	go.opentelemetry.io/contrib/propagators/jaeger v1.16.0 // indirect
+	go.opentelemetry.io/contrib/propagators/ot v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.15.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.38.0 // indirect
