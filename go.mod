@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.0
-	github.com/go-faster/sdk v0.4.0
+	github.com/go-faster/sdk v0.5.0
 	github.com/go-logr/zapr v1.2.3
 	github.com/ogen-go/ogen v0.66.0
 	github.com/prometheus/client_golang v1.15.0
@@ -14,10 +14,10 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.41.0
 	go.opentelemetry.io/contrib/propagators/autoprop v0.41.0
-	go.opentelemetry.io/otel v1.15.0
-	go.opentelemetry.io/otel/metric v0.38.0
-	go.opentelemetry.io/otel/sdk v1.15.0
-	go.opentelemetry.io/otel/trace v1.15.0
+	go.opentelemetry.io/otel v1.15.1
+	go.opentelemetry.io/otel/metric v0.38.1
+	go.opentelemetry.io/otel/sdk v1.15.1
+	go.opentelemetry.io/otel/trace v1.15.1
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.1.0
@@ -50,18 +50,18 @@ require (
 	go.opentelemetry.io/contrib/propagators/b3 v1.16.0 // indirect
 	go.opentelemetry.io/contrib/propagators/jaeger v1.16.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.16.0 // indirect
-	go.opentelemetry.io/otel/exporters/jaeger v1.15.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v0.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.15.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.15.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.15.0 // indirect
-	go.opentelemetry.io/otel/exporters/prometheus v0.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v0.38.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.15.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v0.38.0 // indirect
+	go.opentelemetry.io/otel/exporters/jaeger v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.38.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.38.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v0.38.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/prometheus v0.38.1 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v0.38.1 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.15.1 // indirect
+	go.opentelemetry.io/otel/sdk/metric v0.38.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
