@@ -7,7 +7,7 @@ require (
 	github.com/go-faster/jx v1.0.0
 	github.com/go-faster/sdk v0.5.0
 	github.com/go-logr/zapr v1.2.3
-	github.com/ogen-go/ogen v0.66.0
+	github.com/ogen-go/ogen v0.67.0
 	github.com/prometheus/client_golang v1.15.1
 	github.com/rs/cors v1.9.0
 	github.com/spf13/cobra v1.7.0
