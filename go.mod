@@ -6,7 +6,7 @@ require (
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.0
 	github.com/go-faster/sdk v0.5.0
-	github.com/go-logr/zapr v1.2.3
+	github.com/go-logr/zapr v1.2.4
 	github.com/ogen-go/ogen v0.67.0
 	github.com/prometheus/client_golang v1.15.1
 	github.com/rs/cors v1.9.0
