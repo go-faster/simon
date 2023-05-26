@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
+	sdka "github.com/go-faster/sdk/app"
 	"github.com/go-faster/sdk/zctx"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -21,7 +22,7 @@ func cmdClient() *cobra.Command {
 		Use:   "client",
 		Short: "Run a HTTP client",
 		Run: func(cmd *cobra.Command, args []string) {
-			app.Run(func(ctx context.Context, logger *zap.Logger, m *app.Metrics) error {
+			sdka.Run(func(ctx context.Context, logger *zap.Logger, m *sdka.Metrics) error {
 				addr := os.Getenv("SERVER_ADDR")
 				if addr == "" {
 					addr = "http://localhost:8080"

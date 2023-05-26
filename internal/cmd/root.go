@@ -2,30 +2,17 @@ package cmd
 
 import (
 	"context"
-	"os"
 	"time"
 
-	"github.com/go-faster/sdk/otelenv"
+	"github.com/go-faster/sdk/app"
 	"github.com/spf13/cobra"
-	semconv "go.opentelemetry.io/otel/semconv/v1.18.0"
 	"go.uber.org/zap"
-
-	"github.com/go-faster/simon/internal/app"
 )
 
 func Root() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "simon",
 		Short: "Simon is Observability Workloads Simulator",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if os.Getenv("OTEL_RESOURCE_ATTRIBUTES") == "" && os.Getenv("OTEL_SERVICE_NAME") == "" {
-				// Set default service name and namespace.
-				otelenv.Set(
-					semconv.ServiceName("simon"),
-					semconv.ServiceNamespace("go-faster"),
-				)
-			}
-		},
 		Run: func(cmd *cobra.Command, args []string) {
 			app.Run(func(ctx context.Context, lg *zap.Logger, m *app.Metrics) error {
 				ticker := time.NewTicker(time.Second)
