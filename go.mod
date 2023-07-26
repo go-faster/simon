@@ -6,7 +6,7 @@ require (
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.1
 	github.com/go-faster/sdk v0.7.0
-	github.com/ogen-go/ogen v0.71.1
+	github.com/ogen-go/ogen v0.72.0
 	github.com/rs/cors v1.9.0
 	github.com/spf13/cobra v1.7.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
@@ -64,7 +64,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
+	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
