@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.1.0
-	github.com/go-faster/sdk v0.7.1
+	github.com/go-faster/sdk v0.8.0
 	github.com/ogen-go/ogen v0.72.0
 	github.com/rs/cors v1.9.0
 	github.com/spf13/cobra v1.7.0
