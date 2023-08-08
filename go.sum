@@ -176,8 +176,8 @@ github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APP
 github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zkfA9PSy5pEvNWRP0ET0TIVo=
 github.com/matttproud/golang_protobuf_extensions v1.0.4/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
-github.com/ogen-go/ogen v0.72.0 h1:BmwbInSq2DRStoaEgF9od1da5bq1q+viZlwPS6qXQ1c=
-github.com/ogen-go/ogen v0.72.0/go.mod h1:2SgZ9FRMXsuUhdTq23nFBFgMaXQl6yennmAnIs+hofM=
+github.com/ogen-go/ogen v0.72.1 h1:rNgBxI7yBh2irIwuQyd7Q8SNhZPK69VjYCaiN6MP1u8=
+github.com/ogen-go/ogen v0.72.1/go.mod h1:2SgZ9FRMXsuUhdTq23nFBFgMaXQl6yennmAnIs+hofM=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
