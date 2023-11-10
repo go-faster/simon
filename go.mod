@@ -9,10 +9,10 @@ require (
 	github.com/ogen-go/ogen v0.77.0
 	github.com/rs/cors v1.10.1
 	github.com/spf13/cobra v1.8.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0
-	go.opentelemetry.io/otel v1.19.0
-	go.opentelemetry.io/otel/metric v1.19.0
-	go.opentelemetry.io/otel/trace v1.19.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.0
+	go.opentelemetry.io/otel v1.20.0
+	go.opentelemetry.io/otel/metric v1.20.0
+	go.opentelemetry.io/otel/trace v1.20.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/sync v0.5.0
 )
@@ -23,10 +23,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
-	github.com/felixge/httpsnoop v1.0.3 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect
-	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.2.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
