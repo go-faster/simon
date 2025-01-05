@@ -12,12 +12,23 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
 )
+
+// Invoker invokes operations described by OpenAPI v3 specification.
+type Invoker interface {
+	// Status invokes status operation.
+	//
+	// Get status.
+	//
+	// GET /status
+	Status(ctx context.Context) (*Status, error)
+}
 
 // Client implements OAS client.
 type Client struct {
@@ -78,13 +89,14 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // GET /status
 func (c *Client) Status(ctx context.Context) (*Status, error) {
 	res, err := c.sendStatus(ctx)
-	_ = res
 	return res, err
 }
 
 func (c *Client) sendStatus(ctx context.Context) (res *Status, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("status"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/status"),
 	}
 
 	// Run stopwatch.
@@ -92,14 +104,14 @@ func (c *Client) sendStatus(ctx context.Context) (res *Status, err error) {
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "Status",
+	ctx, span := c.cfg.Tracer.Start(ctx, StatusOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
