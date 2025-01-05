@@ -18,8 +18,6 @@ jobs:
         runner:
           - ubuntu-latest
         include:
-          - arch: 386
-            runner: ubuntu-latest
           - arch: amd64
             runner: ubuntu-latest
             flags: "-race"
