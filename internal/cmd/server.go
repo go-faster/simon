@@ -45,6 +45,7 @@ func cmdServer() *cobra.Command {
 				if addr == "" {
 					addr = "localhost:8080"
 				}
+				lg.Info("Listening on", zap.String("addr", addr))
 				h, err := oas.NewServer(server.Server{},
 					oas.WithMeterProvider(m.MeterProvider()),
 					oas.WithTracerProvider(m.TracerProvider()),
