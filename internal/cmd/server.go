@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-faster/errors"
 	sdka "github.com/go-faster/sdk/app"
+	"github.com/go-faster/sdk/zctx"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -40,15 +41,16 @@ func cmdServer() *cobra.Command {
 		Use:   "server",
 		Short: "Run a HTTP server",
 		Run: func(cmd *cobra.Command, args []string) {
-			sdka.Run(func(ctx context.Context, lg *zap.Logger, m *sdka.Metrics) error {
+			sdka.Run(func(ctx context.Context, lg *zap.Logger, t *sdka.Telemetry) error {
+				ctx = zctx.WithOpenTelemetryZap(ctx)
 				addr := os.Getenv("HTTP_ADDR")
 				if addr == "" {
 					addr = "localhost:8080"
 				}
 				lg.Info("Listening on", zap.String("addr", addr))
 				h, err := oas.NewServer(server.Server{},
-					oas.WithMeterProvider(m.MeterProvider()),
-					oas.WithTracerProvider(m.TracerProvider()),
+					oas.WithMeterProvider(t.MeterProvider()),
+					oas.WithTracerProvider(t.TracerProvider()),
 				)
 				if err != nil {
 					return err
@@ -71,8 +73,8 @@ func cmdServer() *cobra.Command {
 				spanNameFormatter := app.NewSpanNameFormatter(h)
 				instrumentedHandler := otelhttp.NewHandler(c.Handler(h), "",
 					otelhttp.WithSpanNameFormatter(spanNameFormatter),
-					otelhttp.WithMeterProvider(m.MeterProvider()),
-					otelhttp.WithTracerProvider(m.TracerProvider()),
+					otelhttp.WithMeterProvider(t.MeterProvider()),
+					otelhttp.WithTracerProvider(t.TracerProvider()),
 				)
 				s := &http.Server{
 					Addr:              addr,

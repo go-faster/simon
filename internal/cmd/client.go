@@ -22,21 +22,22 @@ func cmdClient() *cobra.Command {
 		Use:   "client",
 		Short: "Run a HTTP client",
 		Run: func(cmd *cobra.Command, args []string) {
-			sdka.Run(func(ctx context.Context, logger *zap.Logger, m *sdka.Metrics) error {
+			sdka.Run(func(ctx context.Context, logger *zap.Logger, t *sdka.Telemetry) error {
+				ctx = zctx.WithOpenTelemetryZap(ctx)
 				addr := os.Getenv("SERVER_ADDR")
 				if addr == "" {
 					addr = "http://localhost:8080"
 				}
 				spanNameFormatter := app.NewSpanNameFormatter(&oas.Server{})
 				c, err := oas.NewClient(addr,
-					oas.WithMeterProvider(m.MeterProvider()),
-					oas.WithTracerProvider(m.TracerProvider()),
+					oas.WithMeterProvider(t.MeterProvider()),
+					oas.WithTracerProvider(t.TracerProvider()),
 					oas.WithClient(&http.Client{
 						Timeout: time.Second * 2,
 						Transport: otelhttp.NewTransport(http.DefaultTransport,
 							otelhttp.WithSpanNameFormatter(spanNameFormatter),
-							otelhttp.WithMeterProvider(m.MeterProvider()),
-							otelhttp.WithTracerProvider(m.TracerProvider()),
+							otelhttp.WithMeterProvider(t.MeterProvider()),
+							otelhttp.WithTracerProvider(t.TracerProvider()),
 						),
 					}),
 				)
@@ -44,7 +45,7 @@ func cmdClient() *cobra.Command {
 					return errors.Wrap(err, "client")
 				}
 				ticker := time.NewTicker(time.Second)
-				tracer := m.TracerProvider().Tracer("")
+				tracer := t.TracerProvider().Tracer("")
 				tick := func() {
 					ctx, cancel := context.WithTimeout(ctx, time.Second)
 					defer cancel()
