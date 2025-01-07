@@ -14,7 +14,7 @@ func Root() *cobra.Command {
 		Use:   "simon",
 		Short: "Simon is Observability Workloads Simulator",
 		Run: func(cmd *cobra.Command, args []string) {
-			app.Run(func(ctx context.Context, lg *zap.Logger, m *app.Metrics) error {
+			app.Run(func(ctx context.Context, lg *zap.Logger, t *app.Telemetry) error {
 				ticker := time.NewTicker(time.Second)
 				for {
 					select {
