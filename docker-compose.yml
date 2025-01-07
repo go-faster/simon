@@ -30,7 +30,6 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
       - OTEL_RESOURCE_ATTRIBUTES=service.name=client
-      - OTEL_PROPAGATORS=tracecontext,baggage
   server:
     image: ghcr.io/go-faster/simon
     build:
