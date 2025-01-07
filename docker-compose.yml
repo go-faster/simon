@@ -24,10 +24,8 @@ services:
     command: ["client"]
     environment:
       - SERVER_ADDR=http://server:8080
+      - OTEL_ZAP_TEE=0
       - OTEL_LOG_LEVEL=debug
-      - OTEL_METRICS_EXPORTER=otlp
-      - OTEL_LOGS_EXPORTER=otlp
-      - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
@@ -41,10 +39,8 @@ services:
     command: ["server"]
     environment:
       - HTTP_ADDR=0.0.0.0:8080
+      - OTEL_ZAP_TEE=0
       - OTEL_LOG_LEVEL=debug
-      - OTEL_METRICS_EXPORTER=otlp
-      - OTEL_LOGS_EXPORTER=otlp
-      - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
