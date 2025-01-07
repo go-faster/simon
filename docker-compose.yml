@@ -19,7 +19,7 @@ services:
     image: ghcr.io/go-faster/simon
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: build.Dockerfile
     restart: always
     command: ["client"]
     environment:
@@ -34,7 +34,7 @@ services:
     image: ghcr.io/go-faster/simon
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: build.Dockerfile
     restart: always
     command: ["server"]
     environment:

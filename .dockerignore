@@ -1,0 +1,12 @@
+_deploy
+_docs
+_oas
+build.Dockerfile
+Dockerfile
+LICENSE
+README.md
+Taskfile.yml
+.golangci.yml
+.goreleaser.yaml
+.gitignore
+.codecov.yml
