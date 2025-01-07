@@ -29,6 +29,7 @@ func LogMiddleware(lg *zap.Logger) middleware.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			reqCtx := r.Context()
+			reqCtx = zctx.WithOpenTelemetryZap(reqCtx)
 			req := r.WithContext(zctx.Base(reqCtx, lg))
 			next.ServeHTTP(w, req)
 		})
