@@ -29,7 +29,6 @@ services:
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=client
   server:
     image: ghcr.io/go-faster/simon
     build:
@@ -44,7 +43,6 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=server
 
   oteldb:
     image: ghcr.io/go-faster/oteldb
