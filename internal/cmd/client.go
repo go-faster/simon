@@ -11,6 +11,8 @@ import (
 	"github.com/go-faster/sdk/zctx"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"go.uber.org/zap"
 
 	"github.com/go-faster/simon/internal/app"
@@ -47,7 +49,7 @@ func cmdClient() *cobra.Command {
 				ticker := time.NewTicker(time.Second)
 				tracer := t.TracerProvider().Tracer("")
 				tick := func() {
-					ctx, cancel := context.WithTimeout(ctx, time.Second)
+					ctx, cancel := context.WithTimeout(ctx, time.Millisecond*250)
 					defer cancel()
 
 					ctx, span := tracer.Start(ctx, "client.tick")
@@ -72,7 +74,20 @@ func cmdClient() *cobra.Command {
 						tick()
 					}
 				}
-			})
+			},
+				sdka.WithResource(func(ctx context.Context) (*resource.Resource, error) {
+					return resource.New(ctx,
+						resource.WithOS(),
+						resource.WithFromEnv(),
+						resource.WithTelemetrySDK(),
+						resource.WithHost(),
+						resource.WithProcess(),
+						resource.WithAttributes(
+							attribute.String("service.name", "simon.client"),
+						),
+					)
+				}),
+			)
 		},
 	}
 }
