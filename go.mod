@@ -7,7 +7,7 @@ toolchain go1.22.10
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/go-faster/sdk v0.20.0
+	github.com/go-faster/sdk v0.21.0
 	github.com/ogen-go/ogen v1.9.0
 	github.com/rs/cors v1.11.1
 	github.com/spf13/cobra v1.8.1
