@@ -14,8 +14,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/resource"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -108,18 +106,7 @@ func cmdServer() *cobra.Command {
 				})
 				return g.Wait()
 			},
-				sdka.WithResource(func(ctx context.Context) (*resource.Resource, error) {
-					return resource.New(ctx,
-						resource.WithOS(),
-						resource.WithFromEnv(),
-						resource.WithTelemetrySDK(),
-						resource.WithHost(),
-						resource.WithProcess(),
-						resource.WithAttributes(
-							attribute.String("service.name", "simon.server"),
-						),
-					)
-				}),
+				sdka.WithServiceName("simon.server"),
 			)
 		},
 	}
