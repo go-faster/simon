@@ -22,6 +22,15 @@ func (UnimplementedHandler) Status(ctx context.Context) (r *Status, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
+// UploadFile implements uploadFile operation.
+//
+// Upload a file.
+//
+// POST /upload
+func (UnimplementedHandler) UploadFile(ctx context.Context, req *UploadFileReq) (r *UploadResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // NewError creates *ErrorStatusCode from error returned by handler.
 //
 // Used for common default response.

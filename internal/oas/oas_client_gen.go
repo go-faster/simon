@@ -20,6 +20,11 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+func trimTrailingSlashes(u *url.URL) {
+	u.Path = strings.TrimRight(u.Path, "/")
+	u.RawPath = strings.TrimRight(u.RawPath, "/")
+}
+
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
 	// Status invokes status operation.
@@ -28,6 +33,12 @@ type Invoker interface {
 	//
 	// GET /status
 	Status(ctx context.Context) (*Status, error)
+	// UploadFile invokes uploadFile operation.
+	//
+	// Upload a file.
+	//
+	// POST /upload
+	UploadFile(ctx context.Context, request *UploadFileReq) (*UploadResponse, error)
 }
 
 // Client implements OAS client.
@@ -43,11 +54,6 @@ var _ Handler = struct {
 	errorHandler
 	*Client
 }{}
-
-func trimTrailingSlashes(u *url.URL) {
-	u.Path = strings.TrimRight(u.Path, "/")
-	u.RawPath = strings.TrimRight(u.RawPath, "/")
-}
 
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
@@ -147,6 +153,81 @@ func (c *Client) sendStatus(ctx context.Context) (res *Status, err error) {
 
 	stage = "DecodeResponse"
 	result, err := decodeStatusResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UploadFile invokes uploadFile operation.
+//
+// Upload a file.
+//
+// POST /upload
+func (c *Client) UploadFile(ctx context.Context, request *UploadFileReq) (*UploadResponse, error) {
+	res, err := c.sendUploadFile(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq) (res *UploadResponse, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("uploadFile"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/upload"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UploadFileOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/upload"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUploadFileRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUploadFileResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

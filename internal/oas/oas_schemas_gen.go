@@ -4,6 +4,8 @@ package oas
 
 import (
 	"fmt"
+
+	ht "github.com/ogen-go/ogen/http"
 )
 
 func (s *ErrorStatusCode) Error() string {
@@ -52,6 +54,52 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 	s.Response = val
 }
 
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // Ref: #/components/schemas/Status
 type Status struct {
 	Message string `json:"message"`
@@ -65,4 +113,55 @@ func (s *Status) GetMessage() string {
 // SetMessage sets the value of Message.
 func (s *Status) SetMessage(val string) {
 	s.Message = val
+}
+
+type UploadFileReq struct {
+	File       ht.MultipartFile `json:"file"`
+	Iterations OptInt           `json:"iterations"`
+}
+
+// GetFile returns the value of File.
+func (s *UploadFileReq) GetFile() ht.MultipartFile {
+	return s.File
+}
+
+// GetIterations returns the value of Iterations.
+func (s *UploadFileReq) GetIterations() OptInt {
+	return s.Iterations
+}
+
+// SetFile sets the value of File.
+func (s *UploadFileReq) SetFile(val ht.MultipartFile) {
+	s.File = val
+}
+
+// SetIterations sets the value of Iterations.
+func (s *UploadFileReq) SetIterations(val OptInt) {
+	s.Iterations = val
+}
+
+// Ref: #/components/schemas/UploadResponse
+type UploadResponse struct {
+	Message string `json:"message"`
+	Hash    string `json:"hash"`
+}
+
+// GetMessage returns the value of Message.
+func (s *UploadResponse) GetMessage() string {
+	return s.Message
+}
+
+// GetHash returns the value of Hash.
+func (s *UploadResponse) GetHash() string {
+	return s.Hash
+}
+
+// SetMessage sets the value of Message.
+func (s *UploadResponse) SetMessage(val string) {
+	s.Message = val
+}
+
+// SetHash sets the value of Hash.
+func (s *UploadResponse) SetHash(val string) {
+	s.Hash = val
 }

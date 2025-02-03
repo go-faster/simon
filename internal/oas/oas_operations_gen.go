@@ -6,5 +6,6 @@ package oas
 type OperationName = string
 
 const (
-	StatusOperation OperationName = "Status"
+	StatusOperation     OperationName = "Status"
+	UploadFileOperation OperationName = "UploadFile"
 )

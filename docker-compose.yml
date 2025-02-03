@@ -21,7 +21,10 @@ services:
       context: .
       dockerfile: build.Dockerfile
     restart: always
-    command: ["client"]
+    command:
+      - "client"
+      - --upload-rps=1
+      - --upload-hash-iterations=500
     environment:
       - SERVER_ADDR=http://server:8080
       - OTEL_ZAP_TEE=0

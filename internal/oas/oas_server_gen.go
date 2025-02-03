@@ -14,6 +14,12 @@ type Handler interface {
 	//
 	// GET /status
 	Status(ctx context.Context) (*Status, error)
+	// UploadFile implements uploadFile operation.
+	//
+	// Upload a file.
+	//
+	// POST /upload
+	UploadFile(ctx context.Context, req *UploadFileReq) (*UploadResponse, error)
 	// NewError creates *ErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

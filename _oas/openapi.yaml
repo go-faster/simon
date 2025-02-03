@@ -6,6 +6,33 @@ info:
 servers:
   - url: 'https://localhost:8080'
 paths:
+  /upload:
+    post:
+      operationId: "uploadFile"
+      description: "Upload a file"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                iterations:
+                  type: integer
+      responses:
+        200:
+          description: "File uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+        default:
+          $ref: "#/components/responses/Error"
   /status:
     get:
       operationId: "status"
@@ -34,7 +61,14 @@ components:
         message:
           type: string
       required: [ message ]
-
+    UploadResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        hash:
+          type: string
+      required: [ message, hash ]
     Error:
       type: object
       description: "error description"
