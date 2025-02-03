@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,7 +19,6 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/go-faster/simon/internal/app"
-	"github.com/go-faster/simon/internal/middleware"
 	"github.com/go-faster/simon/internal/oas"
 	"github.com/go-faster/simon/internal/server"
 )
@@ -48,7 +48,10 @@ func cmdServer() *cobra.Command {
 					addr = "localhost:8080"
 				}
 				lg.Info("Listening on", zap.String("addr", addr))
-				h, err := oas.NewServer(server.Server{},
+				srv := server.NewServer(
+					t.TracerProvider(),
+				)
+				h, err := oas.NewServer(srv,
 					oas.WithMeterProvider(t.MeterProvider()),
 					oas.WithTracerProvider(t.TracerProvider()),
 				)
@@ -81,22 +84,26 @@ func cmdServer() *cobra.Command {
 					ReadHeaderTimeout: time.Second,
 					WriteTimeout:      time.Second,
 					ReadTimeout:       time.Second,
-					Handler:           middleware.Wrap(instrumentedHandler, app.LogMiddleware(lg)),
+					Handler:           instrumentedHandler,
+					BaseContext: func(listener net.Listener) context.Context {
+						return t.BaseContext()
+					},
 				}
 
 				lg.Info("Starting HTTP server", zap.String("addr", addr))
 
-				parentCtx := ctx
 				g, ctx := errgroup.WithContext(ctx)
 				g.Go(func() error {
-					<-ctx.Done()
-					ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-					defer cancel()
-					return s.Shutdown(ctx)
+					select {
+					case <-ctx.Done():
+						return ctx.Err()
+					case <-t.ShutdownContext().Done():
+						return s.Shutdown(t.BaseContext())
+					}
 				})
 				g.Go(func() error {
 					if err := s.ListenAndServe(); err != nil {
-						if errors.Is(err, http.ErrServerClosed) && parentCtx.Err() != nil {
+						if errors.Is(err, http.ErrServerClosed) {
 							lg.Info("HTTP server closed gracefully")
 							return nil
 						}

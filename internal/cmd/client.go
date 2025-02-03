@@ -82,6 +82,8 @@ func cmdClient() *cobra.Command {
 					for {
 						select {
 						case <-t.ShutdownContext().Done():
+							return nil
+						case <-ctx.Done():
 							return ctx.Err()
 						case <-ticker.C:
 							tick()
@@ -158,6 +160,8 @@ func cmdClient() *cobra.Command {
 					for {
 						select {
 						case <-t.ShutdownContext().Done():
+							return nil
+						case <-ctx.Done():
 							return ctx.Err()
 						default:
 							if err := tick(); err != nil {
