@@ -28,6 +28,7 @@ tasks:
     desc: Run tests
     env:
       LC_ALL: C
+      CGO_ENABLED: 1
     vars:
       TEST_OPTIONS: '{{default "" .TEST_OPTIONS}}'
       SOURCE_FILES: '{{default "./..." .SOURCE_FILES}}'
@@ -90,3 +91,11 @@ tasks:
         sh: 'if [[ $GITHUB_REF != refs/tags/v* ]]; then echo "--snapshot"; fi'
     cmds:
       - goreleaser release --clean --timeout 60m {{.SNAPSHOT}}
+
+  gather-pgo:
+    desc: Gather PGO profiles
+    cmds:
+      - rm -f ./cmd/simon/*.pgo
+      - profilecli query merge --query='{service_name="simon.server"}' --profile-type="process_cpu:cpu:nanoseconds:cpu:nanoseconds" --from="now-5m" --to="now" --output=pprof=./cmd/simon/server.pgo
+      - profilecli query merge --query='{service_name="simon.client"}' --profile-type="process_cpu:cpu:nanoseconds:cpu:nanoseconds" --from="now-5m" --to="now" --output=pprof=./cmd/simon/client.pgo
+      - go tool pprof -proto ./cmd/simon/server.pgo ./cmd/simon/client.pgo > ./cmd/simon/default.pgo
