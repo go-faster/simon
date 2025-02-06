@@ -137,7 +137,7 @@ signs:
     signature: "${artifact}.sig"
     certificate: '${artifact}.pem'
     output: true
-    artifacts: all
+    artifacts: archive
     args:
       - sign-blob
       - "--key"
@@ -152,7 +152,7 @@ signs:
     signature: "${artifact}.keyless.sig"
     certificate: '${artifact}.keyless.pem'
     output: true
-    artifacts: all
+    artifacts: archive
     args:
       - sign-blob
       - "--output-certificate"
