@@ -44,7 +44,7 @@ release:
     ## Docker images
 
     ```
-    {{ .Env.IMAGE }}:v{{ .Version }}
+    {{ .Env.IMAGE }}:{{ .Version }}
     ```
 
   github:
