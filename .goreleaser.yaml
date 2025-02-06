@@ -35,8 +35,18 @@ archives:
       - cosign.pub
 
 release:
-  # prerelease: allow # remove this when we start publishing non-prerelease or set to auto
-  # draft: true # allow for manual edits
+  mode: replace
+  draft: false
+  prerelease: auto
+
+  # Templates: allowed
+  footer: |
+    ## Docker images
+
+    ```
+    {{ .Env.IMAGE }}:v{{ .Version }}
+    ```
+
   github:
     owner: go-faster
     name: simon
@@ -181,24 +191,40 @@ changelog:
       - Merge branch
       - go mod tidy
   groups:
-    - title: Dependency updates
-      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+    - title: 'Helm chart updates'
+      order: 700
+      regexp: '^.*?(feat|fix|chore)\(helm\)!?:.+$'
+    - title: 'Dependency updates'
+      regexp: '^.*?(feat|fix|chore)\(deps\)!?:.+$'
       order: 300
     - title: 'New Features'
-      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      regexp: '^.*?feat(\(\S+\))??!?:.+$'
       order: 100
     - title: 'Security updates'
-      regexp: '^.*?sec(\([[:word:]]+\))??!?:.+$'
+      regexp: '^.*?sec(\(\S+\))??!?:.+$'
       order: 150
+    - title: 'Performance updates'
+      regexp: '^.*?perf(\(\S+\))??!?:.+$'
+      order: 250
     - title: 'Bug fixes'
-      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      regexp: '^.*?fix(\(\S+\))??!?:.+$'
       order: 200
     - title: 'Documentation updates'
-      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      regexp: '^.*?docs(\(\S+\))??!?:.+$'
       order: 400
+    - title: 'Benchmarking tooling changes'
+      regexp: '^.*?(\(\S*bench\S*\))!?:.+$'
+      order: 450
     - title: 'Build process updates'
-      regexp: ^.*?build(\([[:word:]]+\))??!?:.+$
-      order: 400
+      regexp: '^.*?build(\(\S+\))??!?:.+$'
+      order: 500
+    - title: 'CI/CD updates'
+      regexp: '^.*?ci(\(\S+\))??!?:.+$'
+      order: 600
+    - title: 'Updates to tests'
+      regexp: '^.*?test(\(\S+\))??!?:.+$'
+      order: 600
+
     - title: Other work
       order: 9999
 
