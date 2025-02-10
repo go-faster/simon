@@ -37,7 +37,7 @@ jobs:
             lint-${{ runner.os }}-go-
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v6.3.0
+        uses: golangci/golangci-lint-action@v6.3.2
         with:
           version: latest
           args: --timeout 5m
