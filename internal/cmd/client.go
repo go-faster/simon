@@ -180,7 +180,7 @@ func cmdClient() *cobra.Command {
 	}
 
 	cmd.Flags().IntVar(&arg.UploadRPS, "upload-rps", 1, "Upload requests per second")
-	cmd.Flags().IntVar(&arg.UploadHashIterations, "upload-hash-iterations", 10, "Upload hash iterations")
+	cmd.Flags().IntVar(&arg.UploadHashIterations, "upload-hash-iterations", 3, "Upload hash iterations")
 
 	return cmd
 }
