@@ -35,7 +35,7 @@ func (s Server) makeExternalRequest(ctx context.Context) error {
 	ctx, span := s.trace.Start(ctx, "Server.makeExternalRequest")
 	defer span.End()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.google.com/", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.google.com/", http.NoBody)
 	if err != nil {
 		return errors.Wrap(err, "create external request")
 	}
