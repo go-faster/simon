@@ -7,9 +7,12 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"net/http"
+	"os/exec"
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/zctx"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
@@ -25,6 +28,101 @@ func NewServer(tracerProvider trace.TracerProvider) *Server {
 // Server implements oas.Handler.
 type Server struct {
 	trace trace.Tracer
+}
+
+func (s Server) makeExternalRequest(ctx context.Context) error {
+	// Make external request.
+	ctx, span := s.trace.Start(ctx, "Server.makeExternalRequest")
+	defer span.End()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.google.com/", nil)
+	if err != nil {
+		return errors.Wrap(err, "create external request")
+	}
+
+	span.AddEvent("Starting external request",
+		trace.WithAttributes(
+			attribute.String("url", req.URL.String()),
+			attribute.String("method", req.Method),
+		),
+	)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "do external request")
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 1024))
+	if err != nil {
+		return errors.Wrap(err, "read external response")
+	}
+
+	zctx.From(ctx).Info("Request: external",
+		zap.Int("status", resp.StatusCode),
+		zap.Int("size", len(data)),
+		zap.ByteString("data", data),
+	)
+
+	return nil
+}
+
+func (s Server) makeCurlRequest(ctx context.Context) error {
+	ctx, span := s.trace.Start(ctx, "Server.makeCurlRequest")
+	defer span.End()
+
+	bufErr := new(bytes.Buffer)
+	buf := new(bytes.Buffer)
+	cmd := exec.CommandContext(ctx, "curl", "-s", "https://ifconfig.me", "-o", "-", "--max-time", "5")
+	cmd.Stdout = buf
+	cmd.Stderr = bufErr
+
+	span.AddEvent("Starting curl command",
+		trace.WithAttributes(
+			attribute.StringSlice("args", cmd.Args),
+		),
+	)
+
+	if err := cmd.Run(); err != nil {
+		return errors.Wrapf(err, "curl: %s", bufErr.String())
+	}
+
+	zctx.From(ctx).Info("Request: curl",
+		zap.Int("size", buf.Len()),
+		zap.ByteString("data", buf.Bytes()),
+	)
+
+	return nil
+}
+
+func (s Server) makeShellCommand(ctx context.Context) error {
+	ctx, span := s.trace.Start(ctx, "Server.makeShellCommand")
+	defer span.End()
+
+	bufErr := new(bytes.Buffer)
+	buf := new(bytes.Buffer)
+	cmd := exec.CommandContext(ctx, "sh", "-c", "echo hello && sleep 1 && echo world")
+	cmd.Stdout = buf
+	cmd.Stderr = bufErr
+
+	span.AddEvent("Starting shell command",
+		trace.WithAttributes(
+			attribute.StringSlice("args", cmd.Args),
+		),
+	)
+
+	if err := cmd.Run(); err != nil {
+		return errors.Wrapf(err, "shell: %s", bufErr.String())
+	}
+
+	zctx.From(ctx).Info("Shell",
+		zap.Int("size", buf.Len()),
+		zap.ByteString("data", buf.Bytes()),
+	)
+
+	return nil
 }
 
 func (s Server) UploadFile(ctx context.Context, req *oas.UploadFileReq) (*oas.UploadResponse, error) {
@@ -47,6 +145,16 @@ func (s Server) UploadFile(ctx context.Context, req *oas.UploadFileReq) (*oas.Up
 		if _, err := h.Write(buf.Bytes()); err != nil {
 			return nil, errors.Wrap(err, "write")
 		}
+	}
+
+	if err := s.makeExternalRequest(ctx); err != nil {
+		return nil, errors.Wrap(err, "external request")
+	}
+	if err := s.makeCurlRequest(ctx); err != nil {
+		return nil, errors.Wrap(err, "curl request")
+	}
+	if err := s.makeShellCommand(ctx); err != nil {
+		return nil, errors.Wrap(err, "shell command")
 	}
 
 	return &oas.UploadResponse{
