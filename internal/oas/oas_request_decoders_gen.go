@@ -8,8 +8,6 @@ import (
 	"net/url"
 
 	"github.com/go-faster/errors"
-	"go.uber.org/multierr"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/uri"
@@ -18,6 +16,7 @@ import (
 
 func (s *Server) decodeUploadFileRequest(r *http.Request) (
 	req *UploadFileReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -27,26 +26,26 @@ func (s *Server) decodeUploadFileRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -87,7 +86,7 @@ func (s *Server) decodeUploadFileRequest(r *http.Request) (
 					request.Iterations.SetTo(requestDotIterationsVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"iterations\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"iterations\"")
 				}
 			}
 		}
@@ -112,11 +111,11 @@ func (s *Server) decodeUploadFileRequest(r *http.Request) (
 				}
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"file\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"file\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
