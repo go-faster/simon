@@ -88,7 +88,7 @@ func (s Server) makeCurlRequest(ctx context.Context) error {
 
 	bufErr := new(bytes.Buffer)
 	buf := new(bytes.Buffer)
-	cmd := exec.CommandContext(ctx, "curl", "-s", uri, "-o", "-", "--max-time", "5")
+	cmd := exec.CommandContext(ctx, "curl", "-s", uri, "-o", "-", "--max-time", "5") // #nosec G204
 	cmd.Stdout = buf
 	cmd.Stderr = bufErr
 
