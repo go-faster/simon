@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"os/exec"
 
 	"github.com/go-faster/errors"
@@ -30,12 +31,22 @@ type Server struct {
 	trace trace.Tracer
 }
 
+func (s Server) getEnvDefault(key, def string) string {
+	v := os.Getenv(key)
+	if v == "" {
+		return def
+	}
+	return v
+}
+
 func (s Server) makeExternalRequest(ctx context.Context) error {
 	// Make external request.
 	ctx, span := s.trace.Start(ctx, "Server.makeExternalRequest")
 	defer span.End()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.google.com/", http.NoBody)
+	uri := s.getEnvDefault("EXTERNAL_URL", "https://www.google.com/")
+
+	req, err := http.NewRequestWithContext(ctx, "GET", uri, http.NoBody)
 	if err != nil {
 		return errors.Wrap(err, "create external request")
 	}
@@ -73,9 +84,11 @@ func (s Server) makeCurlRequest(ctx context.Context) error {
 	ctx, span := s.trace.Start(ctx, "Server.makeCurlRequest")
 	defer span.End()
 
+	uri := s.getEnvDefault("CURL_URL", "https://ifconfig.me")
+
 	bufErr := new(bytes.Buffer)
 	buf := new(bytes.Buffer)
-	cmd := exec.CommandContext(ctx, "curl", "-s", "https://ifconfig.me", "-o", "-", "--max-time", "5")
+	cmd := exec.CommandContext(ctx, "curl", "-s", uri, "-o", "-", "--max-time", "5")
 	cmd.Stdout = buf
 	cmd.Stderr = bufErr
 
