@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/go-faster/sdk v0.29.1
+	github.com/go-faster/sdk v0.29.3
 	github.com/ogen-go/ogen v1.16.0
 	github.com/rs/cors v1.11.1
 	github.com/spf13/cobra v1.10.1
@@ -14,7 +14,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/sync v0.17.0
+	golang.org/x/sync v0.18.0
 	golang.org/x/time v0.14.0
 )
 
