@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/go-faster/errors v0.7.1
-	github.com/go-faster/jx v1.1.0
+	github.com/go-faster/jx v1.2.0
 	github.com/go-faster/sdk v0.29.3
 	github.com/ogen-go/ogen v1.16.0
 	github.com/rs/cors v1.11.1
@@ -51,7 +51,7 @@ require (
 	github.com/samber/lo v1.47.0 // indirect
 	github.com/samber/slog-common v0.18.1 // indirect
 	github.com/samber/slog-zap/v2 v2.6.2 // indirect
-	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
