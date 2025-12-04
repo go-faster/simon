@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.2.0
-	github.com/go-faster/sdk v0.31.0
+	github.com/go-faster/sdk v0.32.0
 	github.com/ogen-go/ogen v1.17.0
 	github.com/rs/cors v1.11.1
 	github.com/spf13/cobra v1.10.1
