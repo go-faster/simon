@@ -36,7 +36,6 @@ func cmdClient() *cobra.Command {
 		Short: "Run a HTTP client",
 		Run: func(cmd *cobra.Command, args []string) {
 			sdka.Run(func(ctx context.Context, logger *zap.Logger, t *sdka.Telemetry) error {
-				ctx = zctx.WithOpenTelemetryZap(ctx)
 				addr := os.Getenv("SERVER_ADDR")
 				if addr == "" {
 					addr = "http://localhost:8080"
