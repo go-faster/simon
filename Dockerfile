@@ -1,5 +1,6 @@
-ARG IMG=gcr.io/distroless/static-debian11
-FROM $IMG:nonroot
+FROM ubuntu
+
+RUN apt-get update && apt-get install -y curl
 
 COPY simon /usr/bin/local/simon
 
