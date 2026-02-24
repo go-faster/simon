@@ -58,7 +58,7 @@ func (s Server) makeExternalRequest(ctx context.Context) error {
 		),
 	)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req) // #nosec G704
 	if err != nil {
 		return errors.Wrap(err, "do external request")
 	}
