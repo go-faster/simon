@@ -1,13 +1,26 @@
-FROM golang:1.23
+FROM alpine
 
+ARG TARGETPLATFORM
 
-WORKDIR /tmp/cache
-COPY go.mod go.sum /tmp/cache/
-RUN go mod download
+RUN apk add --no-cache bash \
+	build-base \
+	curl \
+	cosign \
+	docker-cli \
+	docker-cli-buildx \
+	git \
+	gpg \
+	mercurial \
+	make \
+	openssh-client \
+	syft \
+	tini \
+	upx
 
-COPY . /simon
-WORKDIR /simon
-RUN go build -o simon ./cmd/simon
-RUN mv simon /usr/bin/simon
+COPY $TARGETPLATFORM/go-faster-simon*.apk /tmp/
+RUN apk add --no-cache --allow-untrusted /tmp/go-faster-simon*.apk
+
+# Set USER environment variable for Go's user.Current() when cgo is not available
+ENV USER=fs
 
 ENTRYPOINT ["/usr/bin/simon"]
