@@ -9,7 +9,7 @@ require (
 	github.com/ogen-go/ogen v1.20.2
 	github.com/rs/cors v1.11.1
 	github.com/spf13/cobra v1.10.2
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/metric v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
